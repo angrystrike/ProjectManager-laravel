@@ -1,0 +1,19 @@
+.center {
+    margin: 0 auto;
+}
+.bg-white {
+    background-color: white;
+}
+.hidden {
+    display: none;
+}
+.margin-heading {
+    margin-top: 10px;
+}
+
+.margin-comments {
+    margin-top: -15px;
+}
+.vertical {
+    resize: vertical;
+}
