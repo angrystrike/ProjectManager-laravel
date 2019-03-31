@@ -135,8 +135,3 @@
     });
 
 </script>
-
-
-
-{{--// projects/delete-member/{project_id}/{user_id}--}}
-
