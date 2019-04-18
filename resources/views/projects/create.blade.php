@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="col-md-9 col-lg-9 col-sm-9 pull-left">
+    <div class="col-sm-9 ">
         <h3 class="text-center">Create new Project</h3>
             <form method="post" action="{{ route('projects.store') }}">
                 {{ csrf_field() }}
@@ -25,9 +25,9 @@
                         value="{{ $company_id }}"
                     />
 
-                 @endif
+                @endif
 
-                @if($companies != null)
+                @if($companies != null && $company_id != null)
                     <div class="form-group">
                         <label for="company-content">Select company:</label>
 
@@ -57,7 +57,7 @@
             </form>
     </div>
 
-    <div class="col-sm-3 pull-right">
+    <div class="col-sm-3">
         <ul class="list-group">
             <h4>Actions: </h4>
             <li class="list-group-item"><a href="/projects">All Projects</a></li>

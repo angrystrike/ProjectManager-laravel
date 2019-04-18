@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="col-md-9 col-lg-9 col-sm-9 pull-left">
+    <div class="col-sm-9">
             <form method="post" action="{{ route('projects.update', [$project->id]) }}">
                 {{ csrf_field() }}
 
-                <input type="hidden" name="_method" value="put">
+                @method('put')
 
                 <div class="form-group">
                     <label for="project-name">Name:</label>
@@ -34,7 +34,7 @@
             </form>
     </div>
 
-    <div class="col-sm-3 pull-right">
+    <div class="col-sm-3">
         <ul class="list-group">
             <h4>Actions: </h4>
             <li class="list-group-item"><a href="/projects/{{ $project->id }}">View Project</a></li>
