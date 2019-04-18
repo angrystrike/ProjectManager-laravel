@@ -8,12 +8,19 @@
     display: none;
 }
 .margin-heading {
-    margin-top: 10px;
+    margin-top: 20px;
 }
 
 .margin-comments {
-    margin-top: -15px;
+    margin-top: 15px;
 }
 .vertical {
     resize: vertical;
+}
+body {
+    font-family: "Helvetica";
+    font-size: 16px;
+}
+.margin-btn {
+    margin-left: 8px;
 }
