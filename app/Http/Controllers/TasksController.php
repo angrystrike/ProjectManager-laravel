@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\TaskUser;
@@ -11,7 +12,15 @@ use Illuminate\Support\Facades\Auth;
 
 class TasksController extends Controller
 {
-    public function adduser(Request $request)
+    public function deleteMember($task_id, $user_id)
+    {
+        $isDeleted = TaskUser::where('task_id', '=', $task_id)->where('user_id', '=', $user_id)->delete();
+        return response()->json([
+            'success' => $isDeleted
+        ]);
+    }
+
+    public function addUser(Request $request)
     {
         $task = Task::find($request->input('task_id'));
         if (Auth::user()->id == $task->user_id) {
@@ -42,7 +51,7 @@ class TasksController extends Controller
     public function all()
     {
         $tasks = Task::all();
-        return view('tasks.index', ['tasks' => $tasks]);
+        return view('admin.tasks', ['tasks' => $tasks]);
     }
 
     public function index()
@@ -92,15 +101,17 @@ class TasksController extends Controller
 
     public function show(Task $task)
     {
-        $task = Task::find($task->id);
-        $comments = $task->comments;
-        return view('tasks.show', ['task' => $task, 'comments' => $comments ]);
+        $comments = Comment::where('commentable_type', 'App\Models\Task')
+            ->where('commentable_id', $task->id)
+            ->paginate(3);
+        $creator = User::where('id', $task->user_id)->first();
+        $project = Project::where('id', $task->project_id)->first();
+        return view('tasks.show', ['task' => $task, 'comments' => $comments, 'creator' => $creator, 'project' => $project ]);
     }
 
 
     public function edit(Task $task)
     {
-        $task = Project::find($task->id);
         return view('tasks.edit', ['task' => $task]);
     }
 
@@ -123,8 +134,14 @@ class TasksController extends Controller
 
     public function destroy(Task $task)
     {
-        $findTask = Task::find($task->id);
-        if ($findTask && $findTask->delete()) {
+        TaskUser::where('task_id', '=', $task->id)->delete();
+
+        if ($task && $task->delete()) {
+
+            if (Auth::user()->role_id == 1) {
+                return redirect()->route('admin.tasks')
+                    ->with('success' , 'Task deleted successfully');
+            }
 
             return redirect()->route('tasks.index')
                 ->with('success' , 'Task deleted successfully');

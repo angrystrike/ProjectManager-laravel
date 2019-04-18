@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="col-md-9 col-lg-9 col-sm-9 pull-left">
+    <div class="col-sm-9 float-left">
             <form method="post" action="{{ route('tasks.update', [$task->id]) }}">
                 {{ csrf_field() }}
 
@@ -15,6 +15,7 @@
                              name="name"
                              spellcheck="false"
                              class="form-control form-control-lg"
+                             value="{{ $task->name }}"
                     />
                 </div>
 
@@ -67,7 +68,7 @@
             </form>
         </div>
 
-    <div class="col-sm-3 pull-right">
+    <div class="col-sm-3">
         <ul class="list-group">
             <h4>Actions: </h4>
             <li class="list-group-item"><a href="/tasks/{{ $task->id }}">View Task</a></li>
