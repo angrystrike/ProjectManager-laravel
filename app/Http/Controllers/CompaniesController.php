@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
 use App\Models\Company;
+use App\Models\Project;
+use App\Models\Task;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,7 +15,7 @@ class CompaniesController extends Controller
     public function all()
     {
         $companies = Company::all();
-        return view('companies.index', ['companies' => $companies]);
+        return view('admin.companies', ['companies' => $companies]);
     }
 
     public function index()
@@ -48,14 +52,16 @@ class CompaniesController extends Controller
 
     public function show(Company $company)
     {
-        $company = Company::find($company->id);
-        $comments = $company->comments;
-        return view('companies.show', ['company' => $company, 'comments' => $comments]);
+        $comments = Comment::where('commentable_type', 'App\Models\Company')
+            ->where('commentable_id', $company->id)
+            ->paginate(4);
+
+        $creator = User::where('id', $company->user_id)->first();
+        return view('companies.show', ['company' => $company, 'comments' => $comments, 'creator' => $creator]);
     }
 
     public function edit(Company $company)
     {
-        $company = Company::find($company->id);
         return view('companies.edit', ['company' => $company]);
     }
 
@@ -78,10 +84,20 @@ class CompaniesController extends Controller
 
     public function destroy(Company $company)
     {
+        Project::where('company_id', '=', $company->id)
+            ->update([
+                'company_id' => null
+            ]);
+
+        Task::where('company_id', '=', $company->id)
+            ->update([
+                'company_id' => null
+            ]);
+
         $findCompany = Company::find($company->id);
+
         if ($findCompany->delete()) {
-            return redirect()->route('companies.index')
-                ->with('success', 'Company deleted successfully');
+            return back()->with('success', 'Company deleted successfully');
         }
 
         return back()->withInput()->with('error', 'Company could not be deleted');
