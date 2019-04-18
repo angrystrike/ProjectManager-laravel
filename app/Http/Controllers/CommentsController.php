@@ -10,13 +10,8 @@ class CommentsController extends Controller
 {
     public function all()
     {
-        $comments = Comment::all();
-        return view('admin.comments', ['comments' => $comments]);
-    }
-
-    public function create()
-    {
-
+        $comments = Comment::paginate(4);
+        return view('partials.comments', ['comments' => $comments]);
     }
 
     public function store(Request $request)
@@ -36,21 +31,6 @@ class CommentsController extends Controller
         }
 
         return back()->withInput()->with('errors', 'Error creating new comment');
-    }
-
-    public function show(Comment $comment)
-    {
-        //
-    }
-
-    public function edit(Comment $comment)
-    {
-        //
-    }
-
-    public function update(Request $request, Comment $comment)
-    {
-        //
     }
 
     public function destroy(Comment $comment)

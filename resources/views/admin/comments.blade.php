@@ -15,7 +15,7 @@
                             <li class="media border-rounded">
                                 <div class="media-body">
                                     <h4 class="media-heading">
-                                        {{ $comment->user->email }}
+                                       {{ $comment->user->email }}
                                         <br>
                                         <small>
                                             commented on {{ $comment->created_at }}
@@ -28,7 +28,7 @@
                                     <p>
                                         {{ $comment->url }}
                                     </p>
-                                    <button type="button" class="btn btn-danger js-delete" data-id="{{ $comment->id }}">Delete</button>
+                                    <button type="button" class="btn btn-danger js-delete-comment" data-id="{{ $comment->id }}">Delete</button>
                                 </div>
                             </li>
                             <hr>
@@ -37,6 +37,7 @@
                 </div>
 
             </div>
+            <div class="offset-md-5 offset-3">{{ $comments->links() }}</div>
         @else
             <h4 class="text-center margin-comments"> No comments created yet</h4>
         @endif
