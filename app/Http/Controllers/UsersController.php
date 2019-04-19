@@ -2,84 +2,66 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
+use App\Models\Company;
+use App\Models\Project;
+use App\Models\ProjectUser;
+use App\Models\Task;
+use App\Models\TaskUser;
 use App\Models\User;
-use Illuminate\Http\Request;
+
 
 class UsersController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+
+    public function all()
     {
-        //
+        $users = User::where('role_id', '!=', 1)->get();
+        return view('admin.users', ['users' => $users]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function show(User $user)
     {
-        //
+        $companies = Company::where('user_id', $user->id)->get();
+        $projects = Project::where('user_id', $user->id)->get();
+        $tasks = Task::where('user_id', $user->id)->get();
+        $comments = Comment::where('user_id', $user->id)->paginate(3);
+
+        $projectUsers = ProjectUser::where('user_id', $user->id)->get();
+        $jobProjects = [];
+        if (count($projectUsers) > 0) {
+            foreach ($projectUsers as $projectUser) {
+                array_push($jobProjects, Project::where('id', $projectUser->project_id)->first());
+            }
+        }
+
+        $taskUsers = TaskUser::where('user_id', $user->id)->get();
+        $jobTasks = [];
+        if (count($taskUsers) > 0) {
+            foreach ($taskUsers as $taskUser) {
+                array_push($jobTasks, Task::where('id', $taskUser->task_id)->first());
+            }
+        }
+
+        return view('users.show', ['user' => $user, 'companies' => $companies,
+                                        'projects' => $projects, 'tasks' => $tasks,
+                                        'comments' => $comments, 'jobProjects' => $jobProjects,
+                                        'jobTasks' => $jobTasks]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function destroy(User $user)
     {
-        //
-    }
+        Comment::where('user_id', $user->id)->delete();
+        ProjectUser::where('user_id', $user->id)->delete();
+        TaskUser::where('user_id', $user->id)->delete();
+        Task::where('user_id', $user->id)->delete();
+        Project::where('user_id', $user->id)->delete();
+        Company::where('user_id', $user->id)->delete();
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\ModelsUser  $modelsUser
-     * @return \Illuminate\Http\Response
-     */
-    public function show(User $modelsUser)
-    {
-        //
-    }
+        $isDeleted = $user->delete();
+        if ($isDeleted)
+            return session()->flash('success', 'User was deleted successfully!');
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\ModelsUser  $modelsUser
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(User $modelsUser)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\ModelsUser  $modelsUser
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, User $modelsUser)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\ModelsUser  $modelsUser
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(User $modelsUser)
-    {
-        //
+        return session()->flash('errors', 'Error deleting this User');
     }
 }
