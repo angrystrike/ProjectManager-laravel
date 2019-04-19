@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TasksRequest;
 use App\Models\Comment;
 use App\Models\Project;
 use App\Models\Task;
@@ -56,12 +57,8 @@ class TasksController extends Controller
 
     public function index()
     {
-        if (Auth::check()) {
-            $tasks = Task::where('user_id', Auth::user()->id)->get();
-
-            return view('tasks.index', ['tasks'=> $tasks]);
-        }
-        return view('auth.login');
+        $tasks = Task::where('user_id', Auth::user()->id)->get();
+        return view('tasks.index', ['tasks'=> $tasks]);
     }
 
 
@@ -76,23 +73,22 @@ class TasksController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store(TasksRequest $request)
     {
-        if (Auth::check()) {
-            $task = Task::create([
-                'name' => $request->input('name'),
-                'days' => $request->input('days'),
-                'hours' => $request->input('hours'),
-                'duration' => $request->input('duration'),
-                'project_id' => $request->input('project_id'),
-                'user_id' => Auth::user()->id
-            ]);
+        $validatedData = $request->validated();
 
-            if ($task) {
-                return redirect()->route('tasks.show', ['task' => $task->id])
-                    ->with('success' , 'Task created successfully');
-            }
+        $task = Task::create([
+            'name' => $request->input('name'),
+            'days' => $request->input('days'),
+            'hours' => $request->input('hours'),
+            'duration' => $request->input('duration'),
+            'project_id' => $request->input('project_id'),
+            'user_id' => Auth::user()->id
+        ]);
 
+        if ($task) {
+            return redirect()->route('tasks.show', ['task' => $task->id])
+                ->with('success' , 'Task created successfully');
         }
 
         return back()->withInput()->with('errors', 'Error creating new Project');
@@ -115,8 +111,9 @@ class TasksController extends Controller
         return view('tasks.edit', ['task' => $task]);
     }
 
-    public function update(Request $request, Task $task)
+    public function update(TasksRequest $request, Task $task)
     {
+        $validatedData = $request->validated();
         $taskUpdate = Task::where('id', $task->id)
             ->update([
                 'name'=> $request->input('name'),

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProjectsRequest;
 use App\Models\Comment;
 use App\Models\Company;
 use App\Models\Project;
@@ -30,7 +31,7 @@ class ProjectsController extends Controller
 
             if (!$user) {
                 return redirect()->route('projects.show', ['project' => $project])
-                ->with('errors', $request->input('email').' doesnt exist');
+                    ->with('errors', $request->input('email').' doesnt exist');
             }
 
             $projectUser = ProjectUser::where('user_id', $user->id)
@@ -39,7 +40,7 @@ class ProjectsController extends Controller
 
             if ($projectUser) {
                 return redirect()->route('projects.show', ['project' => $project])
-                ->with('errors', $request->input('email') . ' is already a member of this project');
+                    ->with('errors', $request->input('email') . ' is already a member of this project');
             }
 
             $project->users()->attach($user->id);
@@ -58,12 +59,8 @@ class ProjectsController extends Controller
 
     public function index()
     {
-        if (Auth::check()) {
-            $projects = Project::where('user_id', Auth::user()->id)->get();
-
-            return view('projects.index', ['projects'=> $projects]);
-        }
-        return view('auth.login');
+        $projects = Project::where('user_id', Auth::user()->id)->get();
+        return view('projects.index', ['projects'=> $projects]);
     }
 
     public function create($company_id = null)
@@ -76,21 +73,20 @@ class ProjectsController extends Controller
         return view('projects.create', ['company_id' => $company_id, 'companies' => $companies]);
     }
 
-    public function store(Request $request)
+    public function store(ProjectsRequest $request)
     {
-        if (Auth::check()) {
-            $project = Project::create([
-                'name' => $request->input('name'),
-                'description' => $request->input('description'),
-                'company_id' => $request->input('company_id'),
-                'user_id' => Auth::user()->id
-            ]);
+        $validatedData = $request->validated();
 
-            if ($project) {
-                return redirect()->route('projects.show', ['project'=> $project->id])
-                    ->with('success' , 'Project created successfully');
-            }
+        $project = Project::create([
+            'name' => $request->input('name'),
+            'description' => $request->input('description'),
+            'company_id' => $request->input('company_id'),
+            'user_id' => Auth::user()->id
+        ]);
 
+        if ($project) {
+            return redirect()->route('projects.show', ['project'=> $project->id])
+                ->with('success' , 'Project created successfully');
         }
 
         return back()->withInput()->with('errors', 'Error creating new Project');
@@ -112,8 +108,10 @@ class ProjectsController extends Controller
         return view('projects.edit', ['project' => $project]);
     }
 
-    public function update(Request $request, project $project)
+    public function update(ProjectsRequest $request, project $project)
     {
+        $validatedData = $request->validated();
+
         $projectUpdate = Project::where('id', $project->id)
             ->update([
                 'name'=> $request->input('name'),
