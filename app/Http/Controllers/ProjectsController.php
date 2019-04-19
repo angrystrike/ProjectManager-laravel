@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
 use App\Models\Company;
 use App\Models\Project;
+use App\Models\Task;
+use App\Models\TaskUser;
 use App\Models\User;
 use App\Models\ProjectUser;
 use Illuminate\Http\Request;
@@ -11,14 +14,15 @@ use Illuminate\Support\Facades\Auth;
 
 class ProjectsController extends Controller
 {
-    public function deleteMember($project_id, $user_id) {
-        echo "sukaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-       echo "<script> alert('controller'); </script>";
-       /* return back()->withInput()->with('errors', 'Error');*/
+    public function deleteMember($project_id, $user_id)
+    {
+        $isDeleted = ProjectUser::where('project_id', '=', $project_id)->where('user_id', '=', $user_id)->delete();
+        return response()->json([
+            'success' => $isDeleted
+        ]);
     }
 
-
-    public function adduser(Request $request)
+    public function addUser(Request $request)
     {
         $project = Project::find($request->input('project_id'));
         if (Auth::user()->id == $project->user_id) {
@@ -49,7 +53,7 @@ class ProjectsController extends Controller
     public function all()
     {
         $projects = Project::all();
-        return view('projects.index', ['projects' => $projects]);
+        return view('admin.projects', ['projects' => $projects]);
     }
 
     public function index()
@@ -82,7 +86,6 @@ class ProjectsController extends Controller
                 'user_id' => Auth::user()->id
             ]);
 
-
             if ($project) {
                 return redirect()->route('projects.show', ['project'=> $project->id])
                     ->with('success' , 'Project created successfully');
@@ -91,19 +94,21 @@ class ProjectsController extends Controller
         }
 
         return back()->withInput()->with('errors', 'Error creating new Project');
-
     }
 
     public function show(Project $project)
     {
-        $project = Project::find($project->id);
-        $comments = $project->comments;
-        return view('projects.show', ['project' => $project, 'comments' => $comments ]);
+        $comments = Comment::where('commentable_type', 'App\Models\Project')
+            ->where('commentable_id', $project->id)
+            ->paginate(3);
+        $creator = User::where('id', $project->user_id)->first();
+        $company = Company::where('id', $project->company_id)->first();
+
+        return view('projects.show', ['project' => $project, 'comments' => $comments, 'creator' => $creator, 'company' => $company ]);
     }
 
     public function edit(Project $project)
     {
-        $project = Project::find($project->id);
         return view('projects.edit', ['project' => $project]);
     }
 
@@ -124,9 +129,19 @@ class ProjectsController extends Controller
 
     public function destroy(Project $project)
     {
+        ProjectUser::where('project_id', '=', $project->id)->delete();
+        $task =  Task::where('project_id', '=', $project->id)->first();
+        if ($task) {
+            TaskUser::where('task_id', '=', $task->id)->delete();
+        }
+        Task::where('project_id', '=', $project->id)->delete();
 
-        $findProject = Project::find($project->id);
-        if ($findProject && $findProject->delete()) {
+        if ($project && $project->delete()) {
+
+            if (Auth::user()->role_id == 1) {
+                return redirect()->route('admin.projects')
+                    ->with('success' , 'Project deleted successfully');
+            }
 
             return redirect()->route('projects.index')
                 ->with('success' , 'Project deleted successfully');
