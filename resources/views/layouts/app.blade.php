@@ -10,9 +10,10 @@
     <title>{{ config('app.name', 'Manager') }}</title>
 
     <!-- Scripts -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 
     <script src="{{ asset('js/app.js') }}"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
@@ -53,10 +54,21 @@
                         @endif
                     @else
                         <li class="nav-item"> <a class="nav-link" href="{{ route('search') }}"><i class="fas fa-search"></i> Search</a></li>
-                        <li class="nav-item"> <a class="nav-link" href="/users/{{ Auth::user()->id }}"><i class="fas fa-building"></i> My Profile</a></li>
                         <li class="nav-item"> <a class="nav-link" href="{{ route('companies.index') }}"><i class="fas fa-building"></i> My Companies</a></li>
                         <li class="nav-item"> <a class="nav-link"  href="{{ route('projects.index') }}"><i class="fas fa-briefcase"></i> My Projects</a></li>
                         <li class="nav-item"> <a class="nav-link" href="{{ route('tasks.index') }}"><i class="fas fa-tasks"></i> My Tasks</a></li>
+
+                        <li class="nav-item dropdown">
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre><i class="fas fa-user-circle"></i>
+                                Social <span class="caret"></span>
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="/users/{{ Auth::user()->id }}"><i class="fas fa-id-badge"></i> My Profile</a>
+                                <a class="dropdown-item" href="/messages"><i class="fas fa-envelope-open-text"></i> My Messages</a>
+                                <a class="dropdown-item" href="/messages/create"><i class="fas fa-reply"></i> New Message</a>
+                            </div>
+                        </li>
 
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre><i class="fas fa-id-badge"></i>

@@ -19,13 +19,13 @@
                                     <th>Users</th>
                                 @endif
                                 @if (count($companies) > 0)
-                                        <th>Companies</th>
+                                    <th>Companies</th>
                                 @endif
                                 @if (count($projects) > 0)
-                                        <th>Projects</th>
+                                    <th>Projects</th>
                                 @endif
                                 @if (count($tasks) > 0)
-                                        <th>Tasks</th>
+                                    <th>Tasks</th>
                                 @endif
                             </tr>
                             </thead>
@@ -36,14 +36,14 @@
                                         <th></th>
                                     @endif
                                     @if (isset($users[$i]))
-                                            <th><a href="/users/{{ $users[$i]->id }}">{{ $users[$i]->name }}</a></th>
+                                        <th><a href="/users/{{ $users[$i]->id }}">{{ $users[$i]->name }}</a></th>
                                     @endif
 
                                     @if (count($companies) > 0 && count($companies) <= $i)
                                         <th></th>
                                     @endif
                                     @if (isset($companies[$i]))
-                                            <th><a href="/companies/{{ $companies[$i]->id }}">{{ $companies[$i]->name }}</a></th>
+                                        <th><a href="/companies/{{ $companies[$i]->id }}">{{ $companies[$i]->name }}</a></th>
                                     @endif
 
                                     @if (count($projects) > 0 && count($projects) <= $i)

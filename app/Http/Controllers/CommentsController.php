@@ -11,7 +11,7 @@ class CommentsController extends Controller
     public function all()
     {
         $comments = Comment::paginate(4);
-        return view('partials.comments', ['comments' => $comments]);
+        return view('admin.comments', ['comments' => $comments]);
     }
 
     public function store(CommentsRequest $request)

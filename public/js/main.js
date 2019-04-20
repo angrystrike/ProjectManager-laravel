@@ -1,3 +1,9 @@
+$(document).ready(
+    function () {
+        $("#multipleSelectExample").select2();
+    }
+);
+
 $(document).ready(function () {
     $(".js-delete-comment").click(function () {
         let comment_id = $(this).data("id");

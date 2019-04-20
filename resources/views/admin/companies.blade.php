@@ -3,7 +3,7 @@
 @section('content')
     <div class="col-md-6 col-lg-6 center">
         <div class="card">
-            <div class="card-header text-center text-white bg-primary"> Companies <a class="pull-right btn btn-primary" href="/companies/create">Create new</a></div>
+            <div class="card-header text-center text-white bg-primary"> Companies <a class="btn btn-primary" href="/companies/create">Create new</a></div>
             <div class="card-body">
                 <ul class="list-group">
                     @if (count($companies) > 0)
