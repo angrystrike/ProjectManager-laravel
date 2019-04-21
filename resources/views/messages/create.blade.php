@@ -1,5 +1,5 @@
 @extends('layouts.app')
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
     <div class="col-sm-9">
         <h3 class="text-center">Create new Message</h3>
@@ -17,26 +17,25 @@
             </div>
 
             @if($users->count() > 0)
-                {{--<div class="checkbox">
-                    @foreach($users as $user)
-                       --}}{{-- <label title="{{ $user->name }}">
-                            <input type="checkbox" name="recipients[]" value="{{ $user->id }}">{!!$user->name!!}
-                        </label>--}}{{--
-                        <label class="checkbox-container" title="{{ $user->name }}">
-                            <input type="checkbox" name="recipients[]" value="{{ $user->id }}">{!!$user->name!!}
-                            <span class="checkmark"></span>
-                        </label>
-                    @endforeach
-                </div>--}}
-                <select id="multipleSelectExample" data-placeholder="Select an option" multiple>
-                    @foreach ($users as $user)
-                        <option name="recipients[]" value="{{ $user->id }}">{!!$user->name!!}</option>
-                    @endforeach
-                </select>
+                <div class="card margin-bot">
+                    <div class="card-header">
+                        <strong>Chat participants:</strong>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="multipleSelect">Choose receivers: </label>
+                            <select style="width: 100%" name="recipients[]" class="form-control form-control-lg" id="multipleSelect" data-placeholder="Select an option" multiple>
+                                @foreach ($users as $user)
+                                    <option value="{{ $user->id }}">{!!$user->name!!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
             @endif
 
             <div class="form-group">
-                <button type="submit" class="btn btn-primary form-control">Submit</button>
+                <button type="submit"  class="btn btn-primary form-control">Submit</button>
             </div>
         </form>
     </div>

@@ -1,8 +1,11 @@
-$(document).ready(
-    function () {
-        $("#multipleSelectExample").select2();
-    }
-);
+$(document).ready(function() {
+    $('#multipleSelect').select2({
+        width: 'resolve'
+    });
+});
+$(function() {
+    $('.select2-selection__rendered').css({margin:'3 15 7 10'});
+});
 
 $(document).ready(function () {
     $(".js-delete-comment").click(function () {

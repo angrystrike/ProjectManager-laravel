@@ -12,13 +12,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 
+
 class MessagesController extends Controller
 {
-    /**
-     * Show all of the message threads to the user.
-     *
-     * @return mixed
-     */
     public function index()
     {
         // All threads, ignore deleted/archived participants
@@ -33,12 +29,6 @@ class MessagesController extends Controller
         return view('messages.index', compact('threads'));
     }
 
-    /**
-     * Shows a message thread.
-     *
-     * @param $id
-     * @return mixed
-     */
     public function show($id)
     {
         try {
@@ -61,23 +51,12 @@ class MessagesController extends Controller
         return view('messages.show', compact('thread', 'users'));
     }
 
-    /**
-     * Creates a new message thread.
-     *
-     * @return mixed
-     */
     public function create()
     {
         $users = User::where('id', '!=', Auth::id())->get();
-
         return view('messages.create', compact('users'));
     }
 
-    /**
-     * Stores a new message thread.
-     *
-     * @return mixed
-     */
     public function store()
     {
         $input = Input::all();
@@ -108,12 +87,7 @@ class MessagesController extends Controller
         return redirect()->route('messages');
     }
 
-    /**
-     * Adds a new message to a current thread.
-     *
-     * @param $id
-     * @return mixed
-     */
+
     public function update($id)
     {
         try {
