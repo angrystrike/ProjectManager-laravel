@@ -3,7 +3,7 @@
     @method('put')
     @csrf
     <div class="form-group">
-        <textarea name="message" class="form-control" placeholder="Type new message">{{ old('message') }}</textarea>
+        <textarea name="message" class="form-control" placeholder="Type new message" required>{{ old('message') }}</textarea>
     </div>
     <br>
 

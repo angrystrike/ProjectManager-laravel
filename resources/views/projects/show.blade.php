@@ -48,8 +48,7 @@
                           id="comment-content"
                           name="url"
                           rows="2" spellcheck="false"
-                          class="form-control form-control-lg">
-                            </textarea>
+                          class="form-control form-control-lg"></textarea>
             </div>
 
             <div class="form-group text-center">

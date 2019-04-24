@@ -24,7 +24,8 @@ class CommentsRequest extends FormRequest
     public function rules()
     {
         return [
-            'body' => 'max:1000'
+            'body' => 'max:1000',
+            'url' => 'max:255'
         ];
     }
 }

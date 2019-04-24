@@ -52,6 +52,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['admin'])->group( function () {
         Route::get('comments/all', 'CommentsController@all')->name('admin.comments');
     });
+    Route::put('comments/update', 'CommentsController@update')->name('comments.update');
     Route::resource('comments', 'CommentsController');
 });
 
