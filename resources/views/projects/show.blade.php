@@ -1,5 +1,5 @@
 @extends('layouts.app')
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
     <div class="col-sm-9">
 
@@ -24,6 +24,7 @@
                 </div>
             @endforeach
         </div>
+
 
         @include('partials.comments')
 
