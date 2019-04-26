@@ -31,7 +31,7 @@ class CompaniesController extends Controller
 
     public function store(CompanyRequest $request)
     {
-        $validatedData = $request->validated();
+        $request->validated();
 
         $company = Company::create([
             'name' => $request->input('name'),
@@ -45,7 +45,7 @@ class CompaniesController extends Controller
         }
 
 
-        return back()->withInput()->with('errors', 'Error creating new company');
+        return back()->withInput()->with('errors', 'Error creating new Company');
     }
 
     public function show(Company $company)
@@ -66,7 +66,7 @@ class CompaniesController extends Controller
 
     public function update(CompanyRequest $request, Company $company)
     {
-        $validatedData = $request->validated();
+        $request->validated();
 
         $companyUpdate = Company::where('id', $company->id)
             ->update([

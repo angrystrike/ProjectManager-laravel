@@ -15,7 +15,7 @@ class TasksController extends Controller
 {
     public function deleteMember($task_id, $user_id)
     {
-        $isDeleted = TaskUser::where('task_id', '=', $task_id)->where('user_id', '=', $user_id)->delete();
+        $isDeleted = TaskUser::where('task_id', $task_id)->where('user_id', $user_id)->delete();
         return response()->json([
             'success' => $isDeleted
         ]);
@@ -75,7 +75,7 @@ class TasksController extends Controller
 
     public function store(TasksRequest $request)
     {
-        $validatedData = $request->validated();
+        $request->validated();
 
         $task = Task::create([
             'name' => $request->input('name'),
@@ -113,7 +113,7 @@ class TasksController extends Controller
 
     public function update(TasksRequest $request, Task $task)
     {
-        $validatedData = $request->validated();
+        $request->validated();
         $taskUpdate = Task::where('id', $task->id)
             ->update([
                 'name'=> $request->input('name'),
@@ -131,7 +131,7 @@ class TasksController extends Controller
 
     public function destroy(Task $task)
     {
-        TaskUser::where('task_id', '=', $task->id)->delete();
+        TaskUser::where('task_id', $task->id)->delete();
 
         if ($task && $task->delete()) {
 

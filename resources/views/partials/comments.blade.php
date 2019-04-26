@@ -1,5 +1,4 @@
 @if (count($comments) > 0)
-
     <div class="message-container hidden">
         <div class="alert alert-dismissable">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -61,12 +60,8 @@
                         @endif
                     </div>
                 </div>
-
-                {{-- </div>--}}
                 <br>
             @endforeach
-
-
 
         </div>
         <div class="row justify-content-center">{{ $comments->links() }}</div>

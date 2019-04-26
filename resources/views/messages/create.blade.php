@@ -2,7 +2,7 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
     <div class="col-sm-9">
-        <h3 class="text-center">Create new Message</h3>
+        <h3 class="text-center">Create new Conversation</h3>
         <form action="{{ route('messages.store') }}" method="post">
             @csrf
             <div class="form-group">

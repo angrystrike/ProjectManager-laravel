@@ -24,7 +24,7 @@ class ProjectsRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'unique:projects|max:190',
+            'name' => 'max:190',
             'description' => 'max:1000'
         ];
     }

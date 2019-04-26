@@ -37,7 +37,6 @@ $(document).ready(function () {
                "_token": token
            },
            success: function (response) {
-               if (response.status === 200) {
                    parent.find(".js-edit-comment-section").addClass("hidden");
                    parent.find(".js-view-comment-section").removeClass("hidden");
                    parent.find(".js-comment-body").text(comment_body);
@@ -49,18 +48,16 @@ $(document).ready(function () {
                    setTimeout(function () {
                        $(".message-container").fadeOut()
                    }, 1700);
-               }
-               else if (response.status === 422) {
+           },
+           error: function (response) {
+               if (response.status === 422) {
                    $(".message-container").fadeIn();
                    $(".message-container > div:first-child").removeClass("alert-success").addClass("alert-danger");
-                   $(".message").text(response.message);
+                   $(".message").text(response.responseJSON.message);
                    setTimeout(function () {
                        $(".message-container").fadeOut()
                    }, 1800);
                }
-           },
-           error: function () {
-               alert('Something went wrong');
            }
        });
    });

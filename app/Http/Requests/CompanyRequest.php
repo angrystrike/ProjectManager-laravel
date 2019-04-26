@@ -24,7 +24,7 @@ class CompanyRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'unique:companies|max:190',
+            'name' => 'max:190',
             'description' => 'max:1000'
         ];
     }

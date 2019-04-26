@@ -75,7 +75,7 @@ class ProjectsController extends Controller
 
     public function store(ProjectsRequest $request)
     {
-        $validatedData = $request->validated();
+        $request->validated();
 
         $project = Project::create([
             'name' => $request->input('name'),
@@ -110,7 +110,7 @@ class ProjectsController extends Controller
 
     public function update(ProjectsRequest $request, project $project)
     {
-        $validatedData = $request->validated();
+       $request->validated();
 
         $projectUpdate = Project::where('id', $project->id)
             ->update([

@@ -16,7 +16,7 @@ class CommentsController extends Controller
 
     public function store(CommentsRequest $request)
     {
-        $validatedData = $request->validated();
+        $request->validated();
 
         $comment = Comment::create([
             'body' => $request->input('body'),
@@ -33,27 +33,16 @@ class CommentsController extends Controller
         return back()->withInput()->with('errors', 'Error creating new comment');
     }
 
-    public function update()
+    public function update(CommentsRequest $request)
     {
-        if (strlen(request('body')) >= 1000 || strlen(request('url')) >= 255 || strlen(request('body')) == 0) {
-            return response()->json([
-                'status' => 422,
-                'message' => 'Incorrect input, changes were not done'
-            ]);
-        }
-
-
-        Comment::where('id', request('id'))
+        $request->validated();
+        Comment::where('id', $request->input('id'))
             ->update([
-                'body' => request('body'),
-                'url' => request('url')
-        ]);
+                'body' => $request->input('body'),
+                'url' => $request->input('url')
+            ]);
 
-        return response()->json([
-            'status' => 200,
-            'message' => 'Comment was successfully updated!'
-        ]);
-
+        return response()->json(['message' => 'Comment was successfully updated!']);
     }
     public function destroy(Comment $comment)
     {
