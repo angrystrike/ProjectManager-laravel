@@ -9,59 +9,58 @@ $(function() {
 });
 
 $(document).ready(function () {
-   $(document).on("click", ".js-edit-comment", function () {
-       let comment_id = $(this).data("id");
-       $(this).closest(".card-body").find(".js-view-comment-section").addClass("hidden");
-       $(this).closest(".card-body").find(".js-edit-comment-section").removeClass("hidden");
-       $(this).replaceWith("<button type='button' class='btn btn-success js-update-comment text white' data-id=" + comment_id + ">Save changes</button>");
-   });
+    $(document).on("click", ".js-edit-comment", function () {
+        let comment_id = $(this).data("id");
+        $(this).closest(".card-body").find(".js-view-comment-section").addClass("hidden");
+        $(this).closest(".card-body").find(".js-edit-comment-section").removeClass("hidden");
+        $(this).replaceWith("<button type='button' class='btn btn-success js-update-comment text white' data-id=" + comment_id + ">Save changes</button>");
+    });
 
 });
 
 $(document).ready(function () {
-   $(document).on("click", ".js-update-comment", function () {
-       let comment_id = $(this).data("id");
-       let comment_body = $(this).closest(".card-body").find(".js-edit-comment-section #comment-body").val();
-       let comment_url = $(this).closest(".card-body").find(".js-edit-comment-section #comment-url").val();
-       let token = $("meta[name='csrf-token']").attr("content");
+    $(document).on("click", ".js-update-comment", function () {
+        let comment_id = $(this).data("id");
+        let comment_body = $(this).closest(".card-body").find(".js-edit-comment-section #comment-body").val();
+        let comment_url = $(this).closest(".card-body").find(".js-edit-comment-section #comment-url").val();
+        let token = $("meta[name='csrf-token']").attr("content");
 
-       let parent = $(this).closest(".card-body");
-       let updBtn = $(this);
-       $.ajax ({
-           url: '/comments/update',
-           type: 'PUT',
-           data: {
-               "id": comment_id,
-               "body": comment_body,
-               "url": comment_url,
-               "_token": token
-           },
-           success: function (response) {
-                   parent.find(".js-edit-comment-section").addClass("hidden");
-                   parent.find(".js-view-comment-section").removeClass("hidden");
-                   parent.find(".js-comment-body").text(comment_body);
-                   parent.find(".js-comment-url").text(comment_url);
-                   updBtn.replaceWith("<button type='button' class='btn btn-info js-edit-comment text-white' data-id=" + comment_id + ">Edit</button>");
-                   $(".message-container").fadeIn();
-                   $(".message-container > div:first-child").removeClass("alert-danger").addClass("alert-success");
-                   $(".message").text(response.message);
-                   setTimeout(function () {
-                       $(".message-container").fadeOut()
-                   }, 1700);
-           },
-           error: function (response) {
-               if (response.status === 422) {
-                   $(".message-container").fadeIn();
-                   $(".message-container > div:first-child").removeClass("alert-success").addClass("alert-danger");
-                   $(".message").text(response.responseJSON.message);
-                   setTimeout(function () {
-                       $(".message-container").fadeOut()
-                   }, 1800);
-               }
-           }
-       });
-   });
+        let parent = $(this).closest(".card-body");
+        let updBtn = $(this);
+        $.ajax ({
+            url: '/comments/update',
+            type: 'PUT',
+            data: {
+                "id": comment_id,
+                "body": comment_body,
+                "url": comment_url,
+                "_token": token
+            },
+            success: function (response) {
+                parent.find(".js-edit-comment-section").addClass("hidden");
+                parent.find(".js-view-comment-section").removeClass("hidden");
+                parent.find(".js-comment-body").text(comment_body);
+                parent.find(".js-comment-url").text(comment_url);
+                updBtn.replaceWith("<button type='button' class='btn btn-info js-edit-comment text-white' data-id=" + comment_id + ">Edit</button>");
+                showMessage(".message-container", ".message-container > div:first-child", ".message", response.message, 2000, "alert-danger", "alert-success");
+            },
+            error: function (response) {
+                if (response.status === 422) {
+                    showMessage(".message-container", ".message-container > div:first-child", ".message", response.responseJSON.message, 2000, "alert-success", "alert-danger");
+                }
+            }
+        });
+    });
 });
+
+function showMessage (containerSelector, titleSelector, messageSelector, messageText, timeout, oldClass, newClass) {
+    $(containerSelector).fadeIn();
+    $(titleSelector).removeClass(oldClass).addClass(newClass);
+    $(messageSelector).text(messageText);
+    setTimeout(function () {
+        $(containerSelector).fadeOut()
+    }, timeout);
+}
 
 $(document).ready(function () {
     $(".js-delete-comment").click(function () {
@@ -74,23 +73,15 @@ $(document).ready(function () {
                 url: "/comments/" + comment_id,
                 type: 'DELETE',
                 data: {
-                    "id": comment_id,
-                    "_token": token,
+                    "_token": token
                 },
                 success: function (response) {
-                    if (response.status === 200) {
-                        $(".message-container").fadeIn();
-                        $(".message-container > div:first-child").removeClass("alert-danger").addClass("alert-success");
-                        $(".message").text(response.message);
-                        setTimeout(function () {
-                            $(".message-container").fadeOut()
-                        }, 1700);
-                        parent.remove();
-                        $("br").remove();
-                    }
+                    showMessage(".message-container", ".message-container > div:first-child", ".message", response.message, 2000, "alert-danger", "alert-success");
+                    parent.remove();
+                    $("br").first().remove(); // POTENTIALLY DANGEROUS CODE
                 },
                 error: function () {
-                    alert("Something went wrong");
+                    showMessage(".message-container", ".message-container > div:first-child", ".message", response.responseJSON.message, 2000, "alert-success", "alert-danger");
                 }
             });
         }
@@ -99,23 +90,23 @@ $(document).ready(function () {
 
 $(document).ready(function () {
     $(".js-delete-member").click(function () {
-        let result = confirm("Are you sure you wish to delete this member?");
+        let result = confirm("Are you sure you wish to remove this member?");
         if (result) {
             let task_id = $(this).data("task_id");
             let user_id = $(this).data("user_id");
             let token = $("meta[name='csrf-token']").attr("content");
+            let parent = $(this).closest("li");
             $.ajax({
                 url: "member/" + task_id + "/" + user_id,
                 type: 'DELETE',
                 data: {
-                    "task_id": task_id,
-                    "user_id": user_id,
-                    "_token": token,
+                    "_token": token
                 },
-                success: function (response) {
-                    if (response.success) {
-                        location.reload();
-                    }
+                success: function () {
+                   parent.remove();
+                },
+                error: function (response) {
+                    alert(response.responseJSON.message);
                 }
             });
         }
@@ -128,18 +119,18 @@ $(document).ready(function () {
         let project_id = $(this).data("project_id");
         let user_id = $(this).data("user_id");
         let token = $("meta[name='csrf-token']").attr("content");
+        let parent = $(this).closest("li");
         $.ajax({
             url: "member/" + project_id + "/" + user_id,
             type: 'DELETE',
             data: {
-                "project_id": project_id,
-                "user_id": user_id,
-                "_token": token,
+                "_token": token
             },
-            success: function (response) {
-                if (response.success) {
-                    location.reload();
-                }
+            success: function () {
+                parent.remove();
+            },
+            error: function (response) {
+                alert(response.responseJSON.message);
             }
         });
 
@@ -162,17 +153,19 @@ $(document).ready(function () {
         if (result) {
             let user_id = $(this).data("id");
             let token = $("meta[name='csrf-token']").attr("content");
+            let parent = $(this).closest("li");
             $.ajax({
                 url: "/users/" + user_id,
                 type: 'DELETE',
                 data: {
-                    "id": user_id,
-                    "_token": token,
+                    "_token": token
                 },
                 dataType: 'html',
                 success: function () {
-                    location.reload();
-
+                    parent.remove();
+                },
+                error: function (response) {
+                    alert(response.responseJSON.message);
                 }
             });
         }
