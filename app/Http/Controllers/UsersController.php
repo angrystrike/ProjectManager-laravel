@@ -59,6 +59,5 @@ class UsersController extends Controller
         Company::where('user_id', $user->id)->delete();
 
         $user->delete();
-        return session()->flash('success', 'User was deleted successfully!');
     }
 }

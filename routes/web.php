@@ -11,6 +11,8 @@ Route::get('/regex', 'RegexController@index');
 
 Route::middleware(['auth'])->group(function () {
 
+    Route::delete('threads/{thread_id}', 'MessagesController@deleteThread')->name('threads.delete');
+
     Route::group(['prefix' => 'messages'], function () {
         Route::get('/', ['as' => 'messages', 'uses' => 'MessagesController@index']);
         Route::get('create', ['as' => 'messages.create', 'uses' => 'MessagesController@create']);

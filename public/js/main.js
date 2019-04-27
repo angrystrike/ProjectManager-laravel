@@ -113,7 +113,6 @@ $(document).ready(function () {
     });
 });
 
-
 $(document).ready(function () {
     $(".js-delete-member").click(function () {
         let project_id = $(this).data("project_id");
@@ -146,7 +145,6 @@ $(document).ready(function () {
     });
 });
 
-
 $(document).ready(function () {
     $(".js-delete-user").click(function () {
         let result = confirm('Are you sure you wish to delete this User? (All info connected to this User will be deleted too)');
@@ -169,6 +167,35 @@ $(document).ready(function () {
                 }
             });
         }
+    });
+});
+
+$(document).ready(function () {
+    $(document).on("click", ".js-delete-conversation", function () {
+       let result = confirm('Are you sure you wish to delete this conversation');
+       if (result) {
+           let thread_id = $(this).data("id");
+           let token = $("meta[name='csrf-token']").attr("content");
+           let parent = $(this).closest(".col-sm-6");
+           $.ajax({
+               url: "/threads/" + thread_id,
+               type: 'DELETE',
+               data: {
+                   "_token": token
+               },
+               success: function (response) {
+                   if (response.status === '401') {
+                       alert(response.message)
+                   }
+                   else {
+                       parent.remove();
+                   }
+               },
+               error: function (response) {
+                   alert(response.responseJSON.message);
+               }
+           });
+       }
     });
 });
 

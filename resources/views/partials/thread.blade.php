@@ -17,12 +17,18 @@
 
             <h6 class="card-title">
                 <strong>Participants:</strong>
-                @for ($i = 0; $i < count($thread->participantsNames()); $i++)
+                @for ($i = 0; $i < count($thread->participantsEmails()); $i++)
                     <a href="/users/{{ $thread->participantsUserIds()[$i] }}">
-                        {{ $thread->participantsNames()[$i] }},
+                        {{ $thread->participantsEmails()[$i] }},
                     </a>
                 @endfor
             </h6>
         </div>
     </div>
+    @if ($thread->creator()->id == Auth::id())
+        <div class="row justify-content-center">
+            <button type="button" class="btn btn-sm btn-danger js-delete-conversation" data-id="{{ $thread->id }}">Delete conversation</button>
+        </div>
+    @endif
 </div>
+

@@ -18,10 +18,12 @@ class MessagesController extends Controller
     public function index()
     {
         // All threads, ignore deleted/archived participants
-         $threads = Thread::getAllLatest()->get();
+         // $threads = Thread::getAllLatest()->get();
 
         // All threads that user is participating in
-        // $threads = Thread::forUser(Auth::id())->latest('updated_at')->get();
+      /*  dump($threads = Thread::forUser(Auth::id())->latest('updated_at'));
+        dd($threads = Thread::forUser(Auth::id())->latest('updated_at')->get());*/
+         $threads = Thread::forUser(Auth::id())->latest('updated_at')->paginate(4);
 
         // All threads that user is participating in, with new messages
         // $threads = Thread::forUserWithNewMessages(Auth::id())->latest('updated_at')->get();
@@ -34,7 +36,7 @@ class MessagesController extends Controller
         try {
             $thread = Thread::findOrFail($id);
         } catch (ModelNotFoundException $e) {
-            Session::flash('error_message', 'The thread with ID: ' . $id . ' was not found.');
+            Session::flash('errors', 'The thread with ID: ' . $id . ' was not found.');
 
             return redirect()->route('messages');
         }
@@ -87,13 +89,12 @@ class MessagesController extends Controller
         return redirect()->route('messages');
     }
 
-
     public function update($id)
     {
         try {
             $thread = Thread::findOrFail($id);
         } catch (ModelNotFoundException $e) {
-            Session::flash('error_message', 'The thread with ID: ' . $id . ' was not found.');
+            Session::flash('errors', 'The thread with ID: ' . $id . ' was not found.');
 
             return redirect()->route('messages');
         }
@@ -121,5 +122,18 @@ class MessagesController extends Controller
         }
 
         return redirect()->route('messages.show', $id);
+    }
+
+    public function deleteThread($thread_id)
+    {
+        $thread = Thread::where('id', $thread_id)->first();
+
+        if (Auth::id() == $thread->creator()->id) {
+            $thread->delete();
+            return response()->json(['success' => 'Conversation was deleted!']);
+        }
+        else {
+            return response()->json(['status' => '401', 'message' => 'You do not have enough credentials for this action']);
+        }
     }
 }
