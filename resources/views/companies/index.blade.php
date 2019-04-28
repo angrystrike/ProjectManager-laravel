@@ -6,7 +6,7 @@
             <div class="card-header text-center text-white bg-primary"> Companies <a class="btn btn-primary" href="/companies/create">Create new</a></div>
             <div class="card-body">
                 <ul class="list-group">
-                    @if (count($companies) > 0)
+                    @if (!is_null($companies) && count($companies) > 0)
                         @foreach($companies as $company)
                             <li class="list-group-item">
                                 <a href="/companies/{{ $company->id }}"> {{ $company->name }} </a>

@@ -65,7 +65,7 @@
         <div class="sidebar-module">
             <h4>Actions: </h4>
             <ol class="list-unstyled">
-                @if ($project->user_id == Auth::user()->id || Auth::user()->role_id == 1)
+                @if (Auth::check() && ($project->user_id == Auth::user()->id || Auth::user()->role_id == 1))
                     <li><a href="/projects/{{ $project->id }}/edit"><i class="fas fa-edit"></i> Edit</a></li>
                     <li><a href="/tasks/create/{{ $project->id }}"><i class="fas fa-tasks"></i> Add Task</a></li>
                 @endif
@@ -73,7 +73,7 @@
 
                 <li><a href="/projects"><i class="fas fa-briefcase"></i> My projects</a></li>
                 <br>
-                @if ($project->user_id == Auth::user()->id || Auth::user()->role_id == 1)
+                @if (Auth::check() && ($project->user_id == Auth::user()->id || Auth::user()->role_id == 1))
                     <li>
                         <a href="#" class="js-delete">
                             <i class="fas fa-trash"></i> Delete
@@ -87,7 +87,7 @@
                     </li>
                 @endif
             </ol>
-            @if ($project->user_id == Auth::user()->id || Auth::user()->role_id == 1)
+            @if (Auth::check() && ($project->user_id == Auth::user()->id || Auth::user()->role_id == 1))
                 <h5>Add members:</h5>
                 <form id="add-user" action="{{ route('projects.addUser') }}" method="POST">
                     {{ csrf_field() }}
@@ -109,7 +109,7 @@
                 @if (count($project->users) > 0)
                     @foreach($project->users as $user)
                         <li class="list-group-item "><a href="/users/{{ $user->id }}">{{ $user->email }}</a>
-                            @if ($project->user_id == Auth::user()->id || Auth::user()->role_id == 1)
+                            @if (Auth::check() && ($project->user_id == Auth::user()->id || Auth::user()->role_id == 1))
                                 <button type="button" class="btn btn-danger btn-sm js-delete-member float-right"
                                         data-project_id="{{ $project->id }}" data-user_id="{{ $user->id  }}">
                                     Remove

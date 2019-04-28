@@ -44,6 +44,7 @@ class CommentsController extends Controller
 
         return response()->json(['message' => 'Comment was successfully updated!']);
     }
+
     public function destroy(Comment $comment)
     {
         $comment->delete();

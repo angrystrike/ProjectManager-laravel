@@ -39,10 +39,55 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <!-- Left Side Of Navbar -->
                 <ul class="navbar-nav mr-auto">
+
                 </ul>
 
                 <ul class="navbar-nav">
-                    <!-- Authentication Links -->
+                    <li class="nav-item"> <a class="nav-link" href="{{ route('search') }}"><i class="fas fa-search"></i> Search</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="{{ route('companies.index') }}"><i class="fas fa-building"></i> My Companies</a></li>
+                    <li class="nav-item"> <a class="nav-link"  href="{{ route('projects.index') }}"><i class="fas fa-briefcase"></i> My Projects</a></li>
+                    <li class="nav-item"> <a class="nav-link" href="{{ route('tasks.index') }}"><i class="fas fa-tasks"></i> My Tasks</a></li>
+
+                    <li class="nav-item dropdown">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre><i class="fas fa-user-circle"></i>
+                            Social <span class="caret"></span>
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            @if (!empty(Auth::user()->id))
+                                <a class="dropdown-item" href="/users/{{ Auth::user()->id }}"><i class="fas fa-id-badge"></i> My Profile</a>
+                            @endif
+                            <a class="dropdown-item" href="/messages"><i class="fas fa-envelope-open-text"></i> My Messages</a>
+                            <a class="dropdown-item" href="/messages/create"><i class="fas fa-reply"></i> New Message</a>
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        @if (!empty(Auth::user()->name))
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre><i class="fas fa-id-badge"></i>
+                                {{ Auth::user()->name }} <span class="caret"></span>
+                            </a>
+                        @endif
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            @if (!empty(Auth::user()->role_id) && Auth::user()->role_id == 1)
+                                <a class="dropdown-item" href="{{ route('admin.companies') }}"><i class="fas fa-building"></i> All Companies</a>
+                                <a class="dropdown-item" href="{{ route('admin.projects') }}"><i class="fas fa-briefcase"></i> All Projects</a>
+                                <a class="dropdown-item" href="{{ route('admin.tasks') }}"><i class="fas fa-tasks"></i> All Tasks</a>
+                                <a class="dropdown-item" href="{{ route('admin.comments') }}"><i class="fas fa-comments"></i> All Comments</a>
+                                <a class="dropdown-item" href="{{ route('admin.users') }}"><i class="fas fa-user-tag"></i> All Users</a>
+                            @endif
+
+                            <a class="dropdown-item" href="{{ route('logout') }}"
+                               onclick="event.preventDefault();
+                                            document.getElementById('logout-form').submit();">
+                                <i class="fas fa-sign-out-alt"></i> {{ __('Logout') }}
+                            </a>
+
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                                @csrf
+                            </form>
+                        </div>
+                    </li>
                     @guest
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('login') }}"><i class="fas fa-sign-in-alt"></i> {{ __('Login') }}</a>
@@ -52,49 +97,6 @@
                                 <a class="nav-link" href="{{ route('register') }}"><i class="fas fa-user-plus"></i> {{ __('Register') }}</a>
                             </li>
                         @endif
-                    @else
-                        <li class="nav-item"> <a class="nav-link" href="{{ route('search') }}"><i class="fas fa-search"></i> Search</a></li>
-                        <li class="nav-item"> <a class="nav-link" href="{{ route('companies.index') }}"><i class="fas fa-building"></i> My Companies</a></li>
-                        <li class="nav-item"> <a class="nav-link"  href="{{ route('projects.index') }}"><i class="fas fa-briefcase"></i> My Projects</a></li>
-                        <li class="nav-item"> <a class="nav-link" href="{{ route('tasks.index') }}"><i class="fas fa-tasks"></i> My Tasks</a></li>
-
-                        <li class="nav-item dropdown">
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre><i class="fas fa-user-circle"></i>
-                                Social <span class="caret"></span>
-                            </a>
-
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="/users/{{ Auth::user()->id }}"><i class="fas fa-id-badge"></i> My Profile</a>
-                                <a class="dropdown-item" href="/messages"><i class="fas fa-envelope-open-text"></i> My Messages</a>
-                                <a class="dropdown-item" href="/messages/create"><i class="fas fa-reply"></i> New Message</a>
-                            </div>
-                        </li>
-
-                        <li class="nav-item dropdown">
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre><i class="fas fa-id-badge"></i>
-                                {{ Auth::user()->name }} <span class="caret"></span>
-                            </a>
-
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                @if (Auth::user()->role_id == 1)
-                                    <a class="dropdown-item" href="{{ route('admin.companies') }}"><i class="fas fa-building"></i> All Companies</a>
-                                    <a class="dropdown-item" href="{{ route('admin.projects') }}"><i class="fas fa-briefcase"></i> All Projects</a>
-                                    <a class="dropdown-item" href="{{ route('admin.tasks') }}"><i class="fas fa-tasks"></i> All Tasks</a>
-                                    <a class="dropdown-item" href="{{ route('admin.comments') }}"><i class="fas fa-comments"></i> All Comments</a>
-                                    <a class="dropdown-item" href="{{ route('admin.users') }}"><i class="fas fa-user-tag"></i> All Users</a>
-                                @endif
-
-                                <a class="dropdown-item" href="{{ route('logout') }}"
-                                   onclick="event.preventDefault();
-                                            document.getElementById('logout-form').submit();">
-                                    <i class="fas fa-sign-out-alt"></i> {{ __('Logout') }}
-                                </a>
-
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
-                                    @csrf
-                                </form>
-                            </div>
-                        </li>
                     @endguest
                 </ul>
 

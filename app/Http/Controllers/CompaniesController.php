@@ -20,7 +20,10 @@ class CompaniesController extends Controller
 
     public function index()
     {
-        $companies = Company::where('user_id', Auth::user()->id)->get();
+        $companies = null;
+        if (Auth::check()) {
+            $companies = Company::where('user_id', Auth::user()->id)->get();
+        }
         return view('companies.index', ['companies' => $companies]);
     }
 

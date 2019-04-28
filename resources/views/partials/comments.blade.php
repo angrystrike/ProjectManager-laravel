@@ -48,7 +48,7 @@
                                 <textarea id="comment-url" name="url" class="form-control form-control-lg">{{ $comment->url }}</textarea>
                             </div>
                         </div>
-                        @if ($comment->user_id == Auth::user()->id || Auth::user()->role_id == 1)
+                        @if (Auth::check() && ($comment->user_id == Auth::user()->id || Auth::user()->role_id == 1))
                             <button type="button" class="btn btn-danger js-delete-comment"
                                     data-id="{{ $comment->id }}">
                                 Delete

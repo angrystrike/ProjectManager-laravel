@@ -2,7 +2,7 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
     <div class="col-sm-10 center">
-        @if (Auth::user()->id == $user->id)
+        @if (Auth::check() && Auth::user()->id == $user->id)
             <h3 class="text-center">Welcome to your Profile page!</h3>
         @endif
         <div class="jumbotron text-center">
@@ -29,28 +29,25 @@
 
         @if (count($jobTasks) > 0)
             <br>
-
             <h5 class="text-center">Currently working on these Tasks: </h5>
             <ul class="list-group">
                 @foreach($jobTasks as $jobTask)
                     <li class="list-group-item"> <a href="/tasks/{{ $jobTask->id }}">{{ $jobTask->name }}</a></li>
                 @endforeach
             </ul>
-
         @endif
-
         <br>
 
         @if (count($companies) > 0)
             <div class="card">
-                <div class="card-header text-center text-white bg-primary"> Companies <a
-                        class="btn btn-primary" href="/companies/create">Create new</a></div>
+                <div class="card-header text-center text-white bg-primary"> Companies
+                    <a class="btn btn-primary" href="/companies/create">Create new</a></div>
                 <div class="card-body">
                     <ul class="list-group">
                         @foreach($companies as $company)
                             <li class="list-group-item">
                                 <a href="/companies/{{ $company->id }}">{{ $company->name }}</a>
-                                @if (Auth::user()->id == $user->id || Auth::user()->role_id == 1)
+                                @if (Auth::check() && (Auth::user()->id == $user->id || Auth::user()->role_id == 1))
                                     <button type="button"
                                             class="btn btn-danger btn-sm float-right margin-btn js-delete">Delete
                                     </button>
@@ -84,7 +81,7 @@
                         @foreach($projects as $project)
                             <li class="list-group-item">
                                 <a href="/projects/{{ $project->id }}">{{ $project->name }}</a>
-                                @if (Auth::user()->id == $user->id || Auth::user()->role_id == 1)
+                                @if (Auth::check() && (Auth::user()->id == $user->id || Auth::user()->role_id == 1))
                                     <button type="button"
                                             class="btn btn-danger btn-sm float-right margin-btn js-delete">Delete
                                     </button>
@@ -119,7 +116,7 @@
                         @foreach($tasks as $task)
                             <li class="list-group-item">
                                 <a href="/tasks/{{ $task->id }}">{{ $task->name }}</a>
-                                @if (Auth::user()->id == $user->id || Auth::user()->role_id == 1)
+                                @if (Auth::check() && (Auth::user()->id == $user->id || Auth::user()->role_id == 1))
                                     <button type="button"
                                             class="btn btn-danger btn-sm float-right margin-btn js-delete">Delete
                                     </button>

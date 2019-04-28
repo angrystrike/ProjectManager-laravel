@@ -1,5 +1,5 @@
 @extends('layouts.app')
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
 
     <div class="col-sm-9">
@@ -51,13 +51,13 @@
         <div class="sidebar-module">
             <h4>Actions: </h4>
             <ol class="list-unstyled">
-                @if ($task->user_id == Auth::user()->id || Auth::user()->role_id == 1)
+                @if (Auth::check() && ($task->user_id == Auth::user()->id || Auth::user()->role_id == 1))
                     <li><a href="/tasks/{{ $task->id }}/edit"><i class="fas fa-edit"></i> Edit</a></li>
                 @endif
                 <li><a href="/tasks/create"><i class="fas fa-plus-circle"></i> Create new Task</a></li>
                 <li><a href="/tasks"><i class="fas fa-briefcase"></i> My Tasks</a></li>
                 <br>
-                @if ($task->user_id == Auth::user()->id || Auth::user()->role_id == 1)
+                @if (Auth::check() && ($task->user_id == Auth::user()->id || Auth::user()->role_id == 1))
                     <li>
                         <a href="#" class="js-delete">
                             <i class="fas fa-trash"></i> Delete
@@ -71,7 +71,7 @@
                     </li>
                 @endif
             </ol>
-            @if ($task->user_id == Auth::user()->id || Auth::user()->role_id == 1)
+            @if (Auth::check() && ($task->user_id == Auth::user()->id || Auth::user()->role_id == 1))
                 <h5>Add members:</h5>
                 <form id="add-user" action="{{ route('tasks.addUser') }}" method="POST">
                     {{ csrf_field() }}
@@ -93,7 +93,7 @@
                 @if (count($task->users) > 0)
                     @foreach($task->users as $user)
                         <li class="list-group-item "><a href="/users/{{$user->id}}">{{ $user->email }}</a>
-                            @if ($task->user_id == Auth::user()->id || Auth::user()->role_id == 1)
+                            @if (Auth::check() && ($task->user_id == Auth::user()->id || Auth::user()->role_id == 1))
                                 <button type="button"
                                         class="btn btn-primary btn-sm js-delete-member btn-danger float-right"
                                         data-task_id="{{ $task->id }}" data-user_id="{{ $user->id }}">Remove

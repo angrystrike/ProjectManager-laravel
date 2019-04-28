@@ -59,7 +59,7 @@
     <div class="col-sm-3">
         <h4>Actions: </h4>
         <ol class="list-unstyled">
-            @if ($company->user_id == Auth::user()->id || Auth::user()->role_id == 1)
+            @if (Auth::check() && ($company->user_id == Auth::user()->id || Auth::user()->role_id == 1))
                 <li><a href="/companies/{{ $company->id }}/edit"><i class="fas fa-edit"></i> Edit</a></li>
                 <li><a href="/projects/create/{{ $company->id }}"><i class="fas fa-briefcase"></i> Add Project</a></li>
             @endif
@@ -67,7 +67,7 @@
 
             <li><a href="/companies"><i class="fas fa-building"></i> My Companies</a></li>
             <br>
-            @if ($company->user_id == Auth::user()->id || Auth::user()->role_id == 1)
+                @if (Auth::check() && ($company->user_id == Auth::user()->id || Auth::user()->role_id == 1))
                 <li>
                     <a href="#" class="js-delete">
                         <i class="fas fa-trash"></i> Delete

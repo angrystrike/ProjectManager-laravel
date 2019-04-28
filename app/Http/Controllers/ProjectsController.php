@@ -56,8 +56,11 @@ class ProjectsController extends Controller
 
     public function index()
     {
-        $projects = Project::where('user_id', Auth::user()->id)->get();
-        return view('projects.index', ['projects'=> $projects]);
+        $projects = null;
+        if (Auth::check()) {
+            $projects = Project::where('user_id', Auth::user()->id)->get();
+        }
+        return view('projects.index', ['projects' => $projects]);
     }
 
     public function create($company_id = null)

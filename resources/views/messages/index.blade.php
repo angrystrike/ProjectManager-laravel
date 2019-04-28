@@ -5,6 +5,9 @@
         <h4 class="text-center">Your conversations:</h4>
     </div>
     @each('partials.thread', $threads, 'thread', 'partials.no-threads')
-    <div class="center">{{ $threads->links() }}</div>
+
+    <div class="col-sm-12 text-center">
+        <div class="d-inline-block">{{ $threads->links() }}</div>
+    </div>
 @endsection
 <script src="{{ URL::asset('js/main.js') }}"></script>
