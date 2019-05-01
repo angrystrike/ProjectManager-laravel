@@ -63,6 +63,4 @@
             <li class="list-group-item"><a href="/projects">All Projects</a></li>
         </ul>
     </div>
-
-
 @endsection

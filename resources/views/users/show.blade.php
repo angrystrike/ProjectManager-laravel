@@ -1,8 +1,7 @@
 @extends('layouts.app')
-<script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 @section('content')
     <div class="col-sm-10 center">
-        <div id="messageBox"></div>
         @if (Auth::check() && Auth::user()->id == $user->id)
             <h3 class="text-center">Welcome to your Profile page!</h3>
         @endif
@@ -16,11 +15,18 @@
             @if (count ($jobTasks) == 0)
                 <p>User is not assigned to any Tasks</p>
             @endif
-            @if (Auth::check() && Auth::user()->id != $user->id)
-                <button type="button" class="btn btn-success js-add-to-friends" data-recipient_id="{{ $user->id }}" data-sender_id="{{ Auth::id() }}">Add to friend list</button>
+            @if (Auth::check() && Auth::id() != $user->id)
+                @if ($state == 0)
+                    <button type="button" class="btn btn-success js-add-to-friends" data-recipient_id="{{ $user->id }}">Add to friend list</button>
+                @elseif ($state == 1)
+                    <button type="button" class="btn btn-info text-white">Friend request sent</button>
+                @elseif ($state == 2)
+                    <button type="button" class="btn btn-warning">Wants to be your friend</button>
+                @elseif ($state == 3)
+                    <button type="button" class="btn btn-success">Is your friend</button>
+                @endif
             @endif
         </div>
-
         @if (count($jobProjects))
             <br>
             <h5 class="text-center">Currently working on these Projects: </h5>
@@ -52,10 +58,8 @@
                             <li class="list-group-item">
                                 <a href="/companies/{{ $company->id }}">{{ $company->name }}</a>
                                 @if (Auth::check() && (Auth::user()->id == $user->id || Auth::user()->role_id == 1))
-                                    <button type="button"
-                                            class="btn btn-danger btn-sm float-right margin-btn js-delete">Delete
-                                    </button>
-                                    <button type="button" class="btn btn-dark btn-sm float-right "><a
+                                    <button type="button"class="btn btn-danger btn-sm float-right margin-btn js-delete">Delete</button>
+                                    <button type="button" class="btn btn-dark btn-sm float-right"><a
                                             href="/companies/{{ $company->id }}/edit" class="text-white">Edit</a>
                                     </button>
                                 @endif
@@ -146,5 +150,3 @@
         @include ('partials.comments')
     </div>
 @endsection
-
-<script src="{{ URL::asset('js/main.js') }}"></script>

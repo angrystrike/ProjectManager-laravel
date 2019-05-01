@@ -47,10 +47,29 @@ class UsersController extends Controller
             }
         }
 
+        $tmp1 = Friendship::where('sender_id', Auth::id())->where('recipient_id', $user->id)->first();
+        $tmp2 = Friendship::where('sender_id', $user->id)->where('recipient_id', Auth::id())->first();
+
+        if (empty($tmp1) && empty($tmp2)) {
+            $relationshipState = 0; // users are not connected in any way
+        }
+        else if (!empty($tmp1) && $tmp1->status == 0) {
+            $relationshipState = 1; // current logged user sent friend request
+        }
+        else if (!empty($tmp2) && $tmp2->status == 0) {
+            $relationshipState = 2; // friend request was already sent to a current logged user
+        }
+        else if ((!empty($tmp1) && $tmp1->status == 1) || (!empty($tmp2) && $tmp2->status == 1)) {
+            $relationshipState = 3; // users are friends
+        }
+        else {
+            $relationshipState = 0;
+        }
+
         return view('users.show', ['user' => $user, 'companies' => $companies,
                                         'projects' => $projects, 'tasks' => $tasks,
                                         'comments' => $comments, 'jobProjects' => $jobProjects,
-                                        'jobTasks' => $jobTasks]);
+                                        'jobTasks' => $jobTasks, 'state' => $relationshipState]);
     }
 
     public function destroy(User $user)
@@ -67,10 +86,7 @@ class UsersController extends Controller
 
     public function addToFriends(Request $request)
     {
-        if (Auth::id() != $request->input('sender_id')) {
-            return response()->json(['message' => 'Friend request was not sent']);
-        }
-        $sender = User::where('id', $request->input('sender_id'))->first();
+        $sender = User::where('id', Auth::id())->first();
         $recipient = User::where('id', $request->input('recipient_id'))->first();
         $sender->befriend($recipient);
 
@@ -79,15 +95,12 @@ class UsersController extends Controller
 
     public function acceptFriend(Request $request)
     {
-        if (Auth::id() != $request->input('recipient_id')) {
-            return response()->json(['message' => 'Friend request was not accepted']);
-        }
         $sender = User::where('id', $request->input('sender_id'))->first();
-        $recipient = User::where('id', $request->input('recipient_id'))->first();
+        $recipient = User::where('id', Auth::id())->first();
 
         $recipient->acceptFriendRequest($sender);
         Friendship::where('sender_id', $request->input('sender_id'))
-            ->where('recipient_id', $request->input('recipient_id'))
+            ->where('recipient_id', Auth::id())
             ->update([
                 'status' => 1
             ]);

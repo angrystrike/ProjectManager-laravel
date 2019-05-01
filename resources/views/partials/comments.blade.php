@@ -1,13 +1,5 @@
 @if (count($comments) > 0)
-    <div class="message-container hidden">
-        <div class="alert alert-dismissable">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            <strong class="message"></strong>
-        </div>
-    </div>
-
+    <div id="messageBox"></div>
     <div class="card">
         <div class="card-header text-center">
             <h4 class="card-title">

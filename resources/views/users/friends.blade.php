@@ -1,8 +1,7 @@
 @extends('layouts.app')
-<script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 @section('content')
     <div class="col-sm-10 center">
-        <div id="messageBox"></div>
         <div class="card">
             <div class="card-header">
                 <ul class="nav nav-pills justify-content-center" role="tablist">
@@ -41,7 +40,7 @@
                                     <li class="list-group-item">
                                         <a href="/users/{{ $request->sender_id }}">{{ $request->email }}</a>   {{ Carbon\Carbon::parse($request->created_at)->diffForHumans() }}
                                         <button type="button" class="btn btn-danger float-right margin-btn">Deny</button>
-                                        <button type="button" class="btn btn-success float-right js-accept-friend" data-recipient_id="{{ Auth::id() }}" data-sender_id="{{ $request->sender_id }}">Accept</button>
+                                        <button type="button" class="btn btn-success float-right js-accept-friend" data-sender_id="{{ $request->sender_id }}">Accept</button>
                                     </li>
                                 @endforeach
                             </ul>
@@ -55,4 +54,4 @@
         </div>
     </div>
 @endsection
-<script src="{{ URL::asset('js/main.js') }}"></script>
+

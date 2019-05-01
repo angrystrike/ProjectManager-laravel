@@ -1,5 +1,5 @@
 @extends('layouts.app')
-<script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 @section('content')
     <div class="col-sm-9">
         <h4 class="text-center">{{ $thread->subject }}</h4>
@@ -16,4 +16,3 @@
         </ul>
     </div>
 @endsection
-<script src="{{ URL::asset('js/main.js') }}"></script>

@@ -16,6 +16,9 @@ class TasksController extends Controller
     public function deleteMember($task_id, $user_id)
     {
        TaskUser::where('task_id', $task_id)->where('user_id', $user_id)->delete();
+        return response()->json([
+            'message' => 'Task member was removed'
+        ]);
     }
 
     public function addUser(Request $request)

@@ -1,7 +1,6 @@
 @extends('layouts.app')
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-@section('content')
 
+@section('content')
     <div class="col-sm-9">
         <div class="jumbotron text-center">
             <h1>{{ $company->name }}</h1>
@@ -9,7 +8,6 @@
             <p class="text-success">created at {{ $company->created_at }}</p>
             <p class="lead">by <a href="/users/{{ $creator->id }}">{{ $creator->email }}</a> </p>
         </div>
-
 
         <div class="row">
             @foreach($company->projects as $project)
@@ -81,9 +79,6 @@
                 </li>
             @endif
         </ol>
-
     </div>
 
 @endsection
-
-<script src="{{ URL::asset('js/main.js') }}"></script>

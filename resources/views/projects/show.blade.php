@@ -1,5 +1,5 @@
 @extends('layouts.app')
-<script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 @section('content')
     <div class="col-sm-9">
 
@@ -110,7 +110,7 @@
                     @foreach($project->users as $user)
                         <li class="list-group-item "><a href="/users/{{ $user->id }}">{{ $user->email }}</a>
                             @if (Auth::check() && ($project->user_id == Auth::user()->id || Auth::user()->role_id == 1))
-                                <button type="button" class="btn btn-danger btn-sm js-delete-member float-right"
+                                <button type="button" class="btn btn-danger btn-sm js-delete-project-member float-right"
                                         data-project_id="{{ $project->id }}" data-user_id="{{ $user->id  }}">
                                     Remove
                                 </button>
@@ -125,6 +125,4 @@
         </div>
     </div>
 @endsection
-
-<script src="{{ URL::asset('js/main.js') }}"></script>
 

@@ -1,5 +1,5 @@
 @extends('layouts.app')
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 @section('content')
     <div class="col-sm-9">
         @if ($project_id == null && count($projects) == 0)
@@ -7,9 +7,7 @@
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <strong>
-                    Task cannot be created before Project. Try to create any Project first.
-                </strong>
+                <strong> Task cannot be created before Project. Try to create any Project first.</strong>
             </div>
         @endif
 

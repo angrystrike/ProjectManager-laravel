@@ -1,7 +1,6 @@
 @extends('layouts.app')
-<script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-@section('content')
 
+@section('content')
     <div class="col-sm-9">
         <div class="jumbotron text-center">
             <h1>{{ $task->name }}</h1>
@@ -95,7 +94,7 @@
                         <li class="list-group-item "><a href="/users/{{$user->id}}">{{ $user->email }}</a>
                             @if (Auth::check() && ($task->user_id == Auth::user()->id || Auth::user()->role_id == 1))
                                 <button type="button"
-                                        class="btn btn-primary btn-sm js-delete-member btn-danger float-right"
+                                        class="btn btn-primary btn-sm js-delete-task-member btn-danger float-right"
                                         data-task_id="{{ $task->id }}" data-user_id="{{ $user->id }}">Remove
                                 </button>
                             @endif
@@ -110,4 +109,3 @@
 
 @endsection
 
-<script src="{{ URL::asset('js/main.js') }}"></script>
