@@ -11,6 +11,10 @@ Route::get('/regex', 'RegexController@index');
 
 Route::middleware(['auth'])->group(function () {
 
+    Route::post('addToFriends', 'UsersController@addToFriends')->name('users.addToFriends');
+    Route::post('acceptFriend', 'UsersController@acceptFriend')->name('users.acceptFriend');
+    Route::get('friends', 'UsersController@friendListInfo')->name('users.friends');
+
     Route::put('comments/update', 'CommentsController@update')->name('comments.update');
     Route::resource('comments', 'CommentsController')->only(['store', 'destroy']);
 

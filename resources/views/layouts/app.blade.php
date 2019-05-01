@@ -56,6 +56,7 @@
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                             @if (!empty(Auth::user()->id))
                                 <a class="dropdown-item" href="/users/{{ Auth::user()->id }}"><i class="fas fa-id-badge"></i> My Profile</a>
+                                <a class="dropdown-item" href="/friends"><i class="fas fa-user-friends"></i> My Friends</a>
                             @endif
                             <a class="dropdown-item" href="/messages"><i class="fas fa-envelope-open-text"></i> My Messages</a>
                             <a class="dropdown-item" href="/messages/create"><i class="fas fa-reply"></i> New Message</a>

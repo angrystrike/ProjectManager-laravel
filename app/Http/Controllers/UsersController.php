@@ -9,6 +9,10 @@ use App\Models\ProjectUser;
 use App\Models\Task;
 use App\Models\TaskUser;
 use App\Models\User;
+use Hootlex\Friendships\Models\Friendship;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 
 class UsersController extends Controller
@@ -59,5 +63,50 @@ class UsersController extends Controller
         Company::where('user_id', $user->id)->delete();
 
         $user->delete();
+    }
+
+    public function addToFriends(Request $request)
+    {
+        if (Auth::id() != $request->input('sender_id')) {
+            return response()->json(['message' => 'Friend request was not sent']);
+        }
+        $sender = User::where('id', $request->input('sender_id'))->first();
+        $recipient = User::where('id', $request->input('recipient_id'))->first();
+        $sender->befriend($recipient);
+
+        return response()->json(['message' => 'Friend request was successfully sent']);
+    }
+
+    public function acceptFriend(Request $request)
+    {
+        if (Auth::id() != $request->input('recipient_id')) {
+            return response()->json(['message' => 'Friend request was not accepted']);
+        }
+        $sender = User::where('id', $request->input('sender_id'))->first();
+        $recipient = User::where('id', $request->input('recipient_id'))->first();
+
+        $recipient->acceptFriendRequest($sender);
+        Friendship::where('sender_id', $request->input('sender_id'))
+            ->where('recipient_id', $request->input('recipient_id'))
+            ->update([
+                'status' => 1
+            ]);
+
+        return response()->json([
+            'message' => $sender->email.' is successfully added to friends',
+            'accepted_friend_id' => $request->input('sender_id'),
+            'accepted_friend_email' => $sender->email
+        ]);
+    }
+
+    public function friendListInfo()
+    {
+        $requests = DB::select(DB::raw("SELECT u.email, f.sender_id, f.status, f.created_at
+                                        FROM users u JOIN friendships f ON u.id = f.sender_id
+                                        WHERE f.recipient_id = ".Auth::id()." AND f.status = 0"));
+
+        $friends = Auth::user()->getFriends();
+
+        return view('users.friends', ['requests' => $requests, 'friends' => $friends]);
     }
 }

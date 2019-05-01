@@ -9,13 +9,100 @@ $(function() {
 });
 
 $(document).ready(function () {
+    $(".js-add-to-friends").click(function () {
+        let sender_id = $(this).data("sender_id");
+        let recipient_id = $(this).data("recipient_id");
+        let token = $("meta[name='csrf-token']").attr("content");
+        $.ajax({
+            url: '/addToFriends',
+            type: 'POST',
+            data: {
+                "sender_id": sender_id,
+                "recipient_id": recipient_id,
+                "_token": token
+            },
+            success: function (response) {
+                showMessage("success", response.message);
+
+            },
+            error: function (response) {
+               showMessage("error", response.responseJSON.message);
+            }
+        });
+    });
+});
+
+$(document).ready(function () {
+   $(".js-accept-friend").click(function () {
+       let sender_id = $(this).data("sender_id");
+       let recipient_id = $(this).data("recipient_id");
+       let token = $("meta[name='csrf-token']").attr("content");
+       let parent = $(this).closest("li");
+       $.ajax({
+           url: '/acceptFriend',
+           type: 'POST',
+           data: {
+               "sender_id": sender_id,
+               "recipient_id": recipient_id,
+               "_token": token
+           },
+           success: function (response) {
+               parent.remove();
+               showMessage("success", response.message);
+               if ($("#friends ul").length) {
+                   $("#friends ul").append("<li class='list-group-item'>" +
+                       "<a href='/users/" + response.accepted_friend_id + "'>" + response.accepted_friend_email + "</a>" +
+                       "<button type=\"button\" class=\"btn btn-danger float-right margin-btn\">Remove</button>\n" +
+                       "<button type=\"button\" class=\"btn btn-success float-right margin-btn\">Write</button></li>");
+               }
+               else {
+                   $("#friends p").replaceWith("<ul class=\"list-unstyled\"><li class='list-group-item'>" +
+                       "<a href='/users/" + response.accepted_friend_id + "'>" + response.accepted_friend_email + "</a>" +
+                       "<button type=\"button\" class=\"btn btn-danger float-right margin-btn\">Remove</button>\n" +
+                       "<button type=\"button\" class=\"btn btn-success float-right margin-btn\">Write</button></li> </ul>");
+               }
+           },
+           error: function (response) {
+               showMessage("error", response.responseJSON.message);
+           }
+       });
+   }) ;
+});
+
+function showMessage(type, text) {
+    if (type === "success") {
+        $("#messageBox").replaceWith("<div class='alert alert-success alert-dismissible'>" +
+            "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
+            "<span aria-hidden='true'>&times;</span>" +
+            "</button>" +
+            "<strong>"+ text +"</strong>" +
+            "</div>");
+    }
+    else if (type === "error") {
+        $("#messageBox").replaceWith("<div class='alert alert-danger alert-dismissible'>" +
+            "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
+            "<span aria-hidden='true'>&times;</span>" +
+            "</button>" +
+            "<strong>"+ text +"</strong>" +
+            "</div>");
+    }
+    else if (type === "warning") {
+        $("#messageBox").replaceWith("<div class='alert alert-warning alert-dismissible'>" +
+            "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
+            "<span aria-hidden='true'>&times;</span>" +
+            "</button>" +
+            "<strong>"+ text +"</strong>" +
+            "</div>");
+    }
+}
+
+$(document).ready(function () {
     $(document).on("click", ".js-edit-comment", function () {
         let comment_id = $(this).data("id");
         $(this).closest(".card-body").find(".js-view-comment-section").addClass("hidden");
         $(this).closest(".card-body").find(".js-edit-comment-section").removeClass("hidden");
         $(this).replaceWith("<button type='button' class='btn btn-success js-update-comment text white' data-id=" + comment_id + ">Save changes</button>");
     });
-
 });
 
 $(document).ready(function () {
@@ -52,15 +139,6 @@ $(document).ready(function () {
         });
     });
 });
-
-function showMessage (containerSelector, titleSelector, messageSelector, messageText, timeout, oldClass, newClass) {
-    $(containerSelector).fadeIn();
-    $(titleSelector).removeClass(oldClass).addClass(newClass);
-    $(messageSelector).text(messageText);
-    setTimeout(function () {
-        $(containerSelector).fadeOut()
-    }, timeout);
-}
 
 $(document).ready(function () {
     $(".js-delete-comment").click(function () {
@@ -103,7 +181,7 @@ $(document).ready(function () {
                     "_token": token
                 },
                 success: function () {
-                   parent.remove();
+                    parent.remove();
                 },
                 error: function (response) {
                     alert(response.responseJSON.message);
@@ -172,30 +250,30 @@ $(document).ready(function () {
 
 $(document).ready(function () {
     $(document).on("click", ".js-delete-conversation", function () {
-       let result = confirm('Are you sure you wish to delete this conversation');
-       if (result) {
-           let thread_id = $(this).data("id");
-           let token = $("meta[name='csrf-token']").attr("content");
-           let parent = $(this).closest(".col-sm-6");
-           $.ajax({
-               url: "/threads/" + thread_id,
-               type: 'DELETE',
-               data: {
-                   "_token": token
-               },
-               success: function (response) {
-                   if (response.status === '401') {
-                       alert(response.message)
-                   }
-                   else {
-                       parent.remove();
-                   }
-               },
-               error: function (response) {
-                   alert(response.responseJSON.message);
-               }
-           });
-       }
+        let result = confirm('Are you sure you wish to delete this conversation');
+        if (result) {
+            let thread_id = $(this).data("id");
+            let token = $("meta[name='csrf-token']").attr("content");
+            let parent = $(this).closest(".col-sm-6");
+            $.ajax({
+                url: "/threads/" + thread_id,
+                type: 'DELETE',
+                data: {
+                    "_token": token
+                },
+                success: function (response) {
+                    if (response.status === '401') {
+                        alert(response.message)
+                    }
+                    else {
+                        parent.remove();
+                    }
+                },
+                error: function (response) {
+                    alert(response.responseJSON.message);
+                }
+            });
+        }
     });
 });
 

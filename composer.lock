@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5889a0970454bf61a65d6ef7aa8d3beb",
-    "content-hash": "259eeeac1eb07dcd93bd7223391b946b",
+    "hash": "7098ec78eb165facb8cdf0328fe4eba5",
+    "content-hash": "cd017f6564c220767971bca6a5cd7c59",
     "packages": [
         {
             "name": "cmgmyr/messenger",
@@ -431,6 +431,64 @@
                 "trusted proxy"
             ],
             "time": "2019-01-10 14:06:47"
+        },
+        {
+            "name": "hootlex/laravel-friendships",
+            "version": "v1.0.24",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hootlex/laravel-friendships.git",
+                "reference": "0100718545bad757006737c21a7b35dc5c52b443"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hootlex/laravel-friendships/zipball/0100718545bad757006737c21a7b35dc5c52b443",
+                "reference": "0100718545bad757006737c21a7b35dc5c52b443",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "codeclimate/php-test-reporter": "^0.3.2",
+                "doctrine/dbal": "^2.5",
+                "fzaninotto/faker": "~1.4",
+                "laravel/laravel": "5.*",
+                "mockery/mockery": "^0.9.5",
+                "phpunit/phpunit": "5.*"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Hootlex\\Friendships\\FriendshipsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Hootlex\\Friendships\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Hootlex",
+                    "email": "hootlex@icloud.com"
+                }
+            ],
+            "description": "This package gives Eloquent models the ability to manage their friendships.",
+            "keywords": [
+                "eloquent",
+                "friend-system",
+                "friends",
+                "friendships",
+                "laravel"
+            ],
+            "time": "2018-07-03 09:16:10"
         },
         {
             "name": "jakub-onderka/php-console-color",

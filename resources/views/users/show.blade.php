@@ -2,6 +2,7 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
     <div class="col-sm-10 center">
+        <div id="messageBox"></div>
         @if (Auth::check() && Auth::user()->id == $user->id)
             <h3 class="text-center">Welcome to your Profile page!</h3>
         @endif
@@ -9,15 +10,18 @@
             <h2>Login: {{ $user->name }}</h2>
             <p class="lead">Email: {{ $user->email }}</p>
             <p class="text-info">created at {{ $user->created_at }}</p>
-            @if (count ($jobProjects) == 0)
+            @if (!count ($jobProjects))
                 <p>User is not assigned to any Projects</p>
             @endif
             @if (count ($jobTasks) == 0)
                 <p>User is not assigned to any Tasks</p>
             @endif
+            @if (Auth::check() && Auth::user()->id != $user->id)
+                <button type="button" class="btn btn-success js-add-to-friends" data-recipient_id="{{ $user->id }}" data-sender_id="{{ Auth::id() }}">Add to friend list</button>
+            @endif
         </div>
 
-        @if (count($jobProjects) > 0)
+        @if (count($jobProjects))
             <br>
             <h5 class="text-center">Currently working on these Projects: </h5>
             <ul class="list-group">
