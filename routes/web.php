@@ -11,6 +11,9 @@ Route::get('/regex', 'RegexController@index');
 
 Route::middleware(['auth'])->group(function () {
 
+    Route::delete('cancelFriendRequest', 'UsersController@cancelFriendRequest')->name('users.cancelFriendRequest');
+    Route::post('denyFriend', 'UsersController@denyFriend')->name('users.denyFriend');
+    Route::delete('deleteFriend', 'UsersController@deleteFriend')->name('users.deleteFriend');
     Route::post('addToFriends', 'UsersController@addToFriends')->name('users.addToFriends');
     Route::post('acceptFriend', 'UsersController@acceptFriend')->name('users.acceptFriend');
     Route::get('friends', 'UsersController@friendListInfo')->name('users.friends');

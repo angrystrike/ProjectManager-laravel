@@ -9,6 +9,32 @@ $(function() {
 });
 
 $(document).ready(function () {
+    $(document).on("click", ".js-delete-friend", function () {
+        let result = confirm("Are you sure you wish to delete him from your friend list?");
+        if (result) {
+            let friend_id = $(this).data("friend_id");
+            let token = $("meta[name='csrf-token']").attr("content");
+            let parent = $(this).closest("li");
+            $.ajax({
+                url: '/deleteFriend',
+                type: 'DELETE',
+                data: {
+                    "friend_id": friend_id,
+                    "_token": token
+                },
+                success: function (response) {
+                    showMessage(".col-sm-10", "success", response.message);
+                    parent.remove();
+                },
+                error: function (response) {
+                    showMessage(".col-sm-10", "danger", response.responseJSON.message);
+                }
+            });
+        }
+    });
+});
+
+$(document).ready(function () {
     $(".js-add-to-friends").click(function () {
         let recipient_id = $(this).data("recipient_id");
         let token = $("meta[name='csrf-token']").attr("content");
@@ -25,72 +51,100 @@ $(document).ready(function () {
                 btn.remove();
             },
             error: function (response) {
-               showMessage(".col-sm-10", "error", response.responseJSON.message);
+                showMessage(".col-sm-10", "danger", response.responseJSON.message);
             }
         });
     });
 });
 
 $(document).ready(function () {
-   $(".js-accept-friend").click(function () {
-       let sender_id = $(this).data("sender_id");
+   $(document).on("click", ".js-cancel-request", function () {
+       let recipient_id = $(this).data("recipient_id");
        let token = $("meta[name='csrf-token']").attr("content");
        let parent = $(this).closest("li");
        $.ajax({
-           url: '/acceptFriend',
-           type: 'POST',
+           url: 'cancelFriendRequest',
+           type: 'DELETE',
            data: {
-               "sender_id": sender_id,
+               "recipient_id": recipient_id,
                "_token": token
            },
            success: function (response) {
-               parent.remove();
                showMessage(".col-sm-10", "success", response.message);
-               if ($("#friends ul").length) {
-                   $("#friends ul").append("<li class='list-group-item'>" +
-                       "<a href='/users/" + response.accepted_friend_id + "'>" + response.accepted_friend_email + "</a>" +
-                       "<button type=\"button\" class=\"btn btn-danger float-right margin-btn\">Remove</button>\n" +
-                       "<button type=\"button\" class=\"btn btn-success float-right margin-btn\">Write</button></li>");
-               }
-               else {
-                   $("#friends p").replaceWith("<ul class=\"list-unstyled\"><li class='list-group-item'>" +
-                       "<a href='/users/" + response.accepted_friend_id + "'>" + response.accepted_friend_email + "</a>" +
-                       "<button type=\"button\" class=\"btn btn-danger float-right margin-btn\">Remove</button>\n" +
-                       "<button type=\"button\" class=\"btn btn-success float-right margin-btn\">Write</button></li> </ul>");
-               }
+               parent.remove();
            },
            error: function (response) {
-               showMessage(".col-sm-10", "error", response.responseJSON.message);
+               showMessage(".col-sm-10", "danger", response.responseJSON.message);
            }
        });
-   }) ;
+   });
+});
+
+$(document).ready(function () {
+    $(".js-accept-friend").click(function () {
+        let sender_id = $(this).data("sender_id");
+        let token = $("meta[name='csrf-token']").attr("content");
+        let parent = $(this).closest("li");
+        $.ajax({
+            url: '/acceptFriend',
+            type: 'POST',
+            data: {
+                "sender_id": sender_id,
+                "_token": token
+            },
+            success: function (response) {
+                parent.remove();
+                showMessage(".col-sm-10", "success", response.message);
+                let newLi = "<li class='list-group-item'>" +
+                                "<a href='/users/" + response.accepted_friend_id + "'>" + response.accepted_friend_email + "</a>" +
+                                "<button type='button' class='btn btn-danger float-right margin-btn js-delete-friend' data-friend_id="+ response.accepted_friend_id+">Remove</button>" +
+                                "<button type='button' class='btn btn-success float-right margin-btn'>Write</button></li>" +
+                             "</li>";
+                if ($("#friends ul").length) {
+                    $("#friends ul").append(newLi);
+                }
+                else {
+                    $("#friends p").replaceWith("<ul class='list-unstyled'>" + newLi + "</ul>");
+                }
+                
+            },
+            error: function (response) {
+                showMessage(".col-sm-10", "danger", response.responseJSON.message);
+            }
+        });
+    }) ;
+});
+
+$(document).ready(function () {
+    $(document).on("click", ".js-deny-friend", function () {
+        let sender_id = $(this).data("sender_id");
+        let token = $("meta[name='csrf-token']").attr("content");
+        let parent = $(this).closest("li");
+        $.ajax({
+            url: '/denyFriend',
+            type: 'POST',
+            data: {
+                "sender_id": sender_id,
+                "_token": token
+            },
+            success: function (response) {
+                parent.remove();
+                showMessage(".col-sm-10", "success", response.message);
+            },
+            error: function (response) {
+                showMessage(".col-sm-10", "danger", response.responseJSON.message);
+            }
+        });
+    });
 });
 
 function showMessage(selector, type, text) {
-    if (type === "success") {
-        $(selector).prepend("<div class='alert alert-success alert-dismissible'>" +
-            "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
-            "<span aria-hidden='true'>&times;</span>" +
-            "</button>" +
-            "<strong>"+ text +"</strong>" +
-            "</div>");
-    }
-    else if (type === "error") {
-        $(selector).prepend("<div class='alert alert-danger alert-dismissible'>" +
-            "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
-            "<span aria-hidden='true'>&times;</span>" +
-            "</button>" +
-            "<strong>"+ text +"</strong>" +
-            "</div>");
-    }
-    else if (type === "warning") {
-        $(selector).prepend("<div class='alert alert-warning alert-dismissible'>" +
-            "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
-            "<span aria-hidden='true'>&times;</span>" +
-            "</button>" +
-            "<strong>"+ text +"</strong>" +
-            "</div>");
-    }
+    $(selector).prepend("<div class='alert alert-" + type + " alert-dismissible'>" +
+        "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
+        "<span aria-hidden='true'>&times;</span>" +
+        "</button>" +
+        "<strong>"+ text +"</strong>" +
+        "</div>");
 }
 
 $(document).ready(function () {
@@ -129,7 +183,7 @@ $(document).ready(function () {
                 showMessage("#messageBox", "success", response.message);
             },
             error: function (response) {
-                showMessage("#messageBox", "error", response.responseJSON.message);
+                showMessage("#messageBox", "danger", response.responseJSON.message);
             }
         });
     });
@@ -153,7 +207,7 @@ $(document).ready(function () {
                     parent.remove();
                 },
                 error: function () {
-                    showMessage("#messageBox", "error", response.responseJSON.message);
+                    showMessage("#messageBox", "danger", response.responseJSON.message);
                 }
             });
         }
@@ -179,7 +233,7 @@ $(document).ready(function () {
                     showMessage(".col-sm-9", "success", response.message);
                 },
                 error: function (response) {
-                    showMessage(".col-sm-9", "error", response.responseJSON.message);
+                    showMessage(".col-sm-9", "danger", response.responseJSON.message);
                 }
             });
         }
@@ -205,7 +259,7 @@ $(document).ready(function () {
                     showMessage(".col-sm-9", "success", response.message);
                 },
                 error: function (response) {
-                    showMessage(".col-sm-9", "error", response.responseJSON.message);
+                    showMessage(".col-sm-9", "danger", response.responseJSON.message);
                 }
             });
         }

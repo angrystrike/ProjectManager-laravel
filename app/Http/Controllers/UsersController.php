@@ -84,6 +84,41 @@ class UsersController extends Controller
         $user->delete();
     }
 
+
+
+    public function deleteFriend(Request $request)
+    {
+        Friendship::where('sender_id', Auth::id())
+            ->where('recipient_id', $request->input('friend_id'))
+            ->where('status', 1)
+            ->delete();
+
+        Friendship::where('sender_id', $request->input('friend_id'))
+            ->where('recipient_id', Auth::id())
+            ->where('status', 1)
+            ->delete();
+
+        return response()->json(['message' => 'That user was deleted from your friend list']);
+    }
+
+    public function denyFriend(Request $request)
+    {
+        $sender = User::where('id', $request->input('sender_id'))->first();
+        Auth::user()->denyFriendRequest($sender);
+
+        return response()->json(['message' => 'Friend request was denied']);
+    }
+
+    public function cancelFriendRequest(Request $request)
+    {
+        Friendship::where('sender_id', Auth::id())
+            ->where('recipient_id', $request->input('recipient_id'))
+            ->where('status', 0)
+            ->delete();
+
+        return response()->json(['message' => 'Friend request was canceled']);
+    }
+
     public function addToFriends(Request $request)
     {
         $sender = User::where('id', Auth::id())->first();
@@ -118,8 +153,12 @@ class UsersController extends Controller
                                         FROM users u JOIN friendships f ON u.id = f.sender_id
                                         WHERE f.recipient_id = ".Auth::id()." AND f.status = 0"));
 
+        $sentRequests = DB::select(DB::raw("SELECT u.email, f.recipient_id, f.status, f.created_at
+                                            FROM users u JOIN friendships f ON u.id = f.recipient_id
+                                            WHERE f.sender_id = ".Auth::id()." AND f.status = 0"));
+
         $friends = Auth::user()->getFriends();
 
-        return view('users.friends', ['requests' => $requests, 'friends' => $friends]);
+        return view('users.friends', ['requests' => $requests, 'friends' => $friends, 'sentRequests' => $sentRequests]);
     }
 }
