@@ -35,6 +35,46 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+   $(document).on("click", ".js-message-friend", function () {
+       let recipient_id = $(this).data("recipient_id");
+       vex.dialog.open({
+           message: 'Please enter subject and body of message',
+           input: '<input type="text" class="form-control form-control-lg" name="subject" placeholder="Subject" required>' +
+                  '<textarea name="message" class="form-control form-control-lg" required></textarea>',
+           buttons: [
+               $.extend({}, vex.dialog.buttons.YES, {
+                   text: 'Send'
+               }), $.extend({}, vex.dialog.buttons.NO, {
+                   text: 'Back'
+               })
+           ],
+           callback: function (data) {
+               if (data) {
+                   let token = $("meta[name='csrf-token']").attr("content");
+                   $.ajax({
+                       url: '/messages/',
+                       type: 'POST',
+                       data: {
+                           "recipient_id": recipient_id,
+                           "subject": data.subject,
+                           "message": data.message,
+                           "isAjax": true,
+                           "_token": token
+                       },
+                       success: function (response) {
+                           showMessage(".col-sm-10", "success", response.message);
+                       },
+                       error: function () {
+                           showMessage(".col-sm-10", "danger", "Incorrect input");
+                       }
+                   });
+               }
+           }
+       });
+   });
+});
+
+$(document).ready(function () {
     $(".js-add-to-friends").click(function () {
         let recipient_id = $(this).data("recipient_id");
         let token = $("meta[name='csrf-token']").attr("content");
@@ -97,8 +137,8 @@ $(document).ready(function () {
                 showMessage(".col-sm-10", "success", response.message);
                 let newLi = "<li class='list-group-item'>" +
                                 "<a href='/users/" + response.accepted_friend_id + "'>" + response.accepted_friend_email + "</a>" +
-                                "<button type='button' class='btn btn-danger float-right margin-btn js-delete-friend' data-friend_id="+ response.accepted_friend_id+">Remove</button>" +
-                                "<button type='button' class='btn btn-success float-right margin-btn'>Write</button></li>" +
+                                "<button type='button' class='btn btn-danger float-right margin-btn js-delete-friend' data-friend_id=" + response.accepted_friend_id + ">Remove</button>" +
+                                "<button type='button' class='btn btn-success float-right margin-btn js-message-friend' data-recipient_id=" + response.accepted_friend_id + ">Write</button></li>" +
                              "</li>";
                 if ($("#friends ul").length) {
                     $("#friends ul").append(newLi);
@@ -288,12 +328,12 @@ $(document).ready(function () {
                 data: {
                     "_token": token
                 },
-                dataType: 'html',
-                success: function () {
+                success: function (response) {
                     parent.remove();
+                    showMessage(".card", "success", response.message);
                 },
                 error: function (response) {
-                    alert(response.responseJSON.message);
+                    showMessage(".card", "danger", response.responseJSON.message);
                 }
             });
         }
@@ -315,14 +355,15 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     if (response.status === '401') {
-                        alert(response.message)
+                        showMessage(".col-sm-9", "danger", response.message);
                     }
                     else {
                         parent.remove();
+                        showMessage(".col-sm-9", "success", response.message);
                     }
                 },
                 error: function (response) {
-                    alert(response.responseJSON.message);
+                    showMessage(".col-sm-9", "danger", response.responseJSON.message);
                 }
             });
         }

@@ -50,6 +50,7 @@ Route::group(['middleware' => ['auth', 'verified', 'admin']], function() {
     Route::get('companies/all', 'CompaniesController@all')->name('admin.companies');
     Route::get('projects/all', 'ProjectsController@all')->name('admin.projects');
     Route::get('tasks/all', 'TasksController@all')->name('admin.tasks');
+    Route::delete('users/{user}', 'UsersController@destroy')->name('users.destroy');
     Route::get('users/all', 'UsersController@all')->name('admin.users');
     Route::get('comments/all', 'CommentsController@all')->name('admin.comments');
 });
@@ -66,4 +67,5 @@ Route::get('tasks', 'TasksController@index')->name('tasks.index');
 Route::get('tasks/{task}', 'TasksController@show')->name('tasks.show');
 
 Route::get('users/{user}', 'UsersController@show')->name('users.show');
+
 

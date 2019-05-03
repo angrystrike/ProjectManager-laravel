@@ -130,24 +130,19 @@ class ProjectsController extends Controller
 
     public function destroy(Project $project)
     {
-        ProjectUser::where('project_id', '=', $project->id)->delete();
-        $task =  Task::where('project_id', '=', $project->id)->first();
-        if ($task) {
-            TaskUser::where('task_id', '=', $task->id)->delete();
+        ProjectUser::where('project_id', $project->id)->delete();
+        $tasks = Task::where('project_id', $project->id)->get();
+        foreach ($tasks as $task) {
+            TaskUser::where('task_id', $task->id)->delete();
         }
-        Task::where('project_id', '=', $project->id)->delete();
+        Task::where('project_id', $project->id)->delete();
+        $project->delete();
 
-        if ($project && $project->delete()) {
-
-            if (Auth::user()->role_id == 1) {
-                return redirect()->route('admin.projects')
-                    ->with('success' , 'Project deleted successfully');
-            }
-
-            return redirect()->route('projects.index')
+        if (Auth::user()->role_id == 1) {
+            return redirect()->route('admin.projects')
                 ->with('success' , 'Project deleted successfully');
         }
-
-        return back()->withInput()->with('errors' , 'Project could not be deleted');
+        return redirect()->route('projects.index')
+            ->with('success' , 'Project deleted successfully');
     }
 }

@@ -10,20 +10,23 @@
     <title>{{ config('app.name', 'Manager') }}</title>
 
     <!-- Scripts -->
+    <script src="{{ asset('js/vex.combined.min.js') }}"></script>
+    <script>vex.defaultOptions.className = 'vex-theme-os'</script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 
     <script src="{{ asset('js/app.js') }}"></script>
-    <script src="{{ URL::asset('js/main.js') }}"></script>
+    <script src="{{ asset('js/main.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
 
     <!-- Styles -->
+    <link rel="stylesheet" href="{{ asset('css/vex.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('css/vex-theme-os.css') }}"/>
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
-          integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-    <link rel="stylesheet" href="{{ URL::asset('css/common.css') }}"/>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ asset('css/common.css') }}"/>
 </head>
 <body>
 <div id="app">

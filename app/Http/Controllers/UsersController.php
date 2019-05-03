@@ -82,9 +82,9 @@ class UsersController extends Controller
         Company::where('user_id', $user->id)->delete();
 
         $user->delete();
+
+        return response()->json(['message' => 'User deleted successfully']);
     }
-
-
 
     public function deleteFriend(Request $request)
     {

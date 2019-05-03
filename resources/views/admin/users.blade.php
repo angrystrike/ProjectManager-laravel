@@ -13,7 +13,6 @@
                                 <button type="button" class="btn btn-danger btn-sm float-right margin-btn js-delete-user" data-id="{{ $user->id }}">
                                     Delete
                                 </button>
-
                             </li>
                         @endforeach
                     @else

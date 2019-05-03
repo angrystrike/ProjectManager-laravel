@@ -8,6 +8,7 @@ use Cmgmyr\Messenger\Models\Message;
 use Cmgmyr\Messenger\Models\Participant;
 use Cmgmyr\Messenger\Models\Thread;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
@@ -59,38 +60,47 @@ class MessagesController extends Controller
         return view('messages.create', compact('users'));
     }
 
-    public function store()
+    public function store(Request $request)
     {
+       $request->validate([
+            'subject' => 'required|max:190',
+            'message' => 'max:5000'
+        ]);
+
         $input = Input::all();
 
         $thread = Thread::create([
             'subject' => $input['subject'],
         ]);
 
-        // Message
         Message::create([
             'thread_id' => $thread->id,
             'user_id' => Auth::id(),
             'body' => $input['message'],
         ]);
 
-        // Sender
         Participant::create([
             'thread_id' => $thread->id,
             'user_id' => Auth::id(),
             'last_read' => new Carbon,
         ]);
 
-        // Recipients
         if (Input::has('recipients')) {
             $thread->addParticipant($input['recipients']);
         }
 
+        if (!empty($input['isAjax'])) {
+            return response()->json(['message' => 'Message was successfully sent!']);
+        }
         return redirect()->route('messages');
     }
 
     public function update($id)
     {
+        if (strlen(Input::get('message')) > 190) {
+            return back()->withInput()->with('errors', 'Too long message');
+        }
+
         try {
             $thread = Thread::findOrFail($id);
         } catch (ModelNotFoundException $e) {
@@ -101,14 +111,12 @@ class MessagesController extends Controller
 
         $thread->activateAllParticipants();
 
-        // Message
         Message::create([
             'thread_id' => $thread->id,
             'user_id' => Auth::id(),
             'body' => Input::get('message'),
         ]);
 
-        // Add replier as a participant
         $participant = Participant::firstOrCreate([
             'thread_id' => $thread->id,
             'user_id' => Auth::id(),
@@ -116,7 +124,6 @@ class MessagesController extends Controller
         $participant->last_read = new Carbon;
         $participant->save();
 
-        // Recipients
         if (Input::has('recipients')) {
             $thread->addParticipant(Input::get('recipients'));
         }
