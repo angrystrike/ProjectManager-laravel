@@ -13,9 +13,7 @@
                         <h4 class="card-title">
                             <a href="/users/{{ $comment->user->id }}">{{ $comment->user->email }}</a>
                             <br>
-                            <small>
-                                commented on {{ $comment->created_at }}
-                            </small>
+                            <small>commented on {{ $comment->created_at }}</small>
                         </h4>
                     </div>
                     <div class="card-body">
@@ -54,11 +52,9 @@
                 </div>
                 <br>
             @endforeach
-
         </div>
         <div class="row justify-content-center">{{ $comments->links() }}</div>
     </div>
-
 @else
     <h4 class="text-center"> No comments created yet</h4>
 @endif

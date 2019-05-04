@@ -1,4 +1,4 @@
-<h4>Add a new message</h4>
+<h4 class="margin-heading">Add a new message</h4>
 <form action="{{ route('messages.update', $thread->id) }}" method="post">
     @method('put')
     @csrf
@@ -7,7 +7,7 @@
     </div>
     <br>
 
-    <h4 class="text-center">Invite new participant</h4>
+    <h4 class="text-center">Invite new participants</h4>
     @if($users->count() > 0)
         <div class="card margin-bot">
             <div class="card-header">

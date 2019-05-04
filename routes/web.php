@@ -22,6 +22,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('comments', 'CommentsController')->only(['store', 'destroy']);
 
     Route::delete('threads/{thread_id}', 'MessagesController@deleteThread')->name('threads.delete');
+    Route::delete('messages/{id}', 'MessagesController@destroy')->name('messages.destroy');
+    Route::put('messages', 'MessagesController@edit')->name('messages.edit');
     Route::group(['prefix' => 'messages'], function () {
         Route::get('/', ['as' => 'messages', 'uses' => 'MessagesController@index']);
         Route::get('create', ['as' => 'messages.create', 'uses' => 'MessagesController@create']);

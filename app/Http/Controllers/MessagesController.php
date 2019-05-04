@@ -18,17 +18,7 @@ class MessagesController extends Controller
 {
     public function index()
     {
-        // All threads, ignore deleted/archived participants
-         // $threads = Thread::getAllLatest()->get();
-
-        // All threads that user is participating in
-      /*  dump($threads = Thread::forUser(Auth::id())->latest('updated_at'));
-        dd($threads = Thread::forUser(Auth::id())->latest('updated_at')->get());*/
-         $threads = Thread::forUser(Auth::id())->latest('updated_at')->paginate(4);
-
-        // All threads that user is participating in, with new messages
-        // $threads = Thread::forUserWithNewMessages(Auth::id())->latest('updated_at')->get();
-
+        $threads = Thread::forUser(Auth::id())->latest('updated_at')->paginate(4);
         return view('messages.index', compact('threads'));
     }
 
@@ -42,10 +32,6 @@ class MessagesController extends Controller
             return redirect()->route('messages');
         }
 
-        // show current user in list if not a current participant
-        // $users = User::whereNotIn('id', $thread->participantsUserIds())->get();
-
-        // don't show the current user in list
         $userId = Auth::id();
         $users = User::whereNotIn('id', $thread->participantsUserIds($userId))->get();
 
@@ -90,6 +76,7 @@ class MessagesController extends Controller
         }
 
         if (!empty($input['isAjax'])) {
+            $thread->addParticipant($request->input('recipient_id'));
             return response()->json(['message' => 'Message was successfully sent!']);
         }
         return redirect()->route('messages');
@@ -129,6 +116,32 @@ class MessagesController extends Controller
         }
 
         return redirect()->route('messages.show', $id);
+    }
+
+    public function edit(Request $request)
+    {
+        if (strlen(request('body')) > 190 || strlen(request('body')) == 0) {
+            return response()->json(['status' => '422', 'message' => 'Incorrect input']);
+        }
+        $message = Message::where('id', $request->input('id'))->first();
+        if (Auth::id() != $message->user_id) {
+            return response()->json(['status' => '401', 'message' => 'You do not have enough credentials for this action']);
+        }
+        $message->update([
+            'body' => $request->input('body')
+        ]);
+        return response()->json(['message' => 'Message updated successfully']);
+    }
+
+    public function destroy($id)
+    {
+        $message = Message::where('id', $id)->first();
+        if (Auth::id() != $message->user_id) {
+            return response()->json(['status' => '401', 'message' => 'You do not have enough credentials for this action']);
+        }
+        $message->delete();
+
+        return response()->json(['message' => 'Message deleted!']);
     }
 
     public function deleteThread($thread_id)

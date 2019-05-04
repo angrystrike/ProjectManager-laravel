@@ -9,6 +9,79 @@ $(function() {
 });
 
 $(document).ready(function () {
+   $(document).on("click", ".js-delete-message", function () {
+       let id = $(this).data("id");
+       let parent = $(this).closest(".card");
+       let token = $("meta[name='csrf-token']").attr("content");
+       vex.dialog.confirm ({
+           message: 'Delete message?',
+           callback: function (value) {
+               if (value) {
+                   $.ajax({
+                       url: '/messages/' + id,
+                       type: 'DELETE',
+                       data: {
+                           "_token": token
+                       },
+                       success: function (response) {
+                           if (response.status === '401') {
+                               showMessage(".col-sm-9", "danger", response.message);
+                           }
+                           else {
+                               showMessage(".col-sm-9", "success", response.message);
+                               parent.remove();
+                           }
+                       },
+                       error: function (response) {
+                           showMessage(".col-sm-9", "danger", response.responseJSON.message);
+                       }
+                   });
+               }
+           }
+       });
+   });
+});
+
+$(document).ready(function () {
+   $(document).on("click", ".js-edit-message", function () {
+       let id = $(this).data("id");
+       let message_body = $(this).parent().find(".js-message-body").text();
+       $(this).parent().find(".js-message-body").replaceWith('<textarea name="message" class="form-control form-control-lg">' + message_body + '</textarea>');
+       $(this).replaceWith('<button type="button" class="btn btn-success js-update-message mr-top-10" data-id=' + id + '>Save changes</button>');
+   });
+});
+
+$(document).on("click", ".js-update-message", function () {
+    let id = $(this).data("id");
+    let textarea = $(this).parent().find("textarea");
+    let body = textarea.val();
+    let btn = $(this);
+    let token = $("meta[name='csrf-token']").attr("content");
+    $.ajax ({
+        url: '/messages',
+        type: 'PUT',
+        data: {
+            "id": id,
+            "body": body,
+            "_token": token
+        },
+        success: function (response) {
+            if (typeof response.status !== 'undefined') {
+                showMessage(".col-sm-9", "danger", response.message);
+            }
+            else {
+                textarea.replaceWith('<p class="js-message-body">' + body + '</p>');
+                btn.replaceWith('<button type="button" class="btn btn-primary js-edit-message mr-top-10" data-id=' + id + '>Edit</button>');
+                showMessage(".col-sm-9", "success", response.message);
+            }
+        },
+        error: function (response) {
+            showMessage(".col-sm-9", "danger", response.responseJSON.message);
+        }
+    });
+});
+
+$(document).ready(function () {
     $(document).on("click", ".js-delete-friend", function () {
         let result = confirm("Are you sure you wish to delete him from your friend list?");
         if (result) {
@@ -44,7 +117,8 @@ $(document).ready(function () {
            buttons: [
                $.extend({}, vex.dialog.buttons.YES, {
                    text: 'Send'
-               }), $.extend({}, vex.dialog.buttons.NO, {
+               }),
+               $.extend({}, vex.dialog.buttons.NO, {
                    text: 'Back'
                })
            ],
