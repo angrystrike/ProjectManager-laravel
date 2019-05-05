@@ -1,4 +1,4 @@
-<h4 class="margin-heading">Add a new message</h4>
+<h4 class="mr-top-25">Add a new message</h4>
 <form action="{{ route('messages.update', $thread->id) }}" method="post">
     @method('put')
     @csrf

@@ -61,7 +61,7 @@ class TasksController extends Controller
         if (Auth::check()) {
             $tasks = Task::where('user_id', Auth::user()->id)->get();
         }
-        return view('tasks.index', ['tasks'=> $tasks]);
+        return view('tasks.index', ['tasks' => $tasks]);
     }
 
 
@@ -82,11 +82,12 @@ class TasksController extends Controller
 
         $task = Task::create([
             'name' => $request->input('name'),
+            'description' => $request->input('description'),
+            'kind' => $request->input('kind'),
+            'priority' => $request->input('priority'),
             'days' => $request->input('days'),
-            'hours' => $request->input('hours'),
-            'duration' => $request->input('duration'),
             'project_id' => $request->input('project_id'),
-            'user_id' => Auth::user()->id
+            'user_id' => Auth::id()
         ]);
 
         if ($task) {
@@ -94,7 +95,7 @@ class TasksController extends Controller
                 ->with('success' , 'Task created successfully');
         }
 
-        return back()->withInput()->with('errors', 'Error creating new Project');
+        return back()->withInput()->with('errors', 'Error creating new Task');
     }
 
 
@@ -105,6 +106,7 @@ class TasksController extends Controller
             ->paginate(3);
         $creator = User::where('id', $task->user_id)->first();
         $project = Project::where('id', $task->project_id)->first();
+
         return view('tasks.show', ['task' => $task, 'comments' => $comments, 'creator' => $creator, 'project' => $project ]);
     }
 
@@ -117,12 +119,14 @@ class TasksController extends Controller
     public function update(TasksRequest $request, Task $task)
     {
         $request->validated();
+
         $taskUpdate = Task::where('id', $task->id)
             ->update([
-                'name'=> $request->input('name'),
-                'days'=> $request->input('days'),
-                'hours'=> $request->input('hours'),
-                'duration'=> $request->input('duration')
+                'name' => $request->input('name'),
+                'description' => $request->input('description'),
+                'kind' => $request->input('kind'),
+                'priority' => $request->input('priority'),
+                'days' => $request->input('days'),
             ]);
 
         if ($taskUpdate) {

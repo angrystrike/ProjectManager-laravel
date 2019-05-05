@@ -3,23 +3,30 @@
 @section('content')
     <div class="col-sm-9">
         <div class="jumbotron text-center">
-            <h1>{{ $task->name }}</h1>
-            <p class="lead">Duration: {{ $task->duration }}</p>
+            <h2>{{ $task->name }}</h2>
+            <h4><i>Type:</i> <mark>{{ $task->kind }}</mark></h4>
+            <h4><i>Priority:</i> <mark>{{ $task->priority }}</mark></h4>
+            <p class="lead">Days: <span class="underline">{{ $task->days }}</span></p>
             <p class="text-success">created at {{ $task->created_at }}</p>
             <p class="lead">by <a href="/users/{{ $creator->id }}">{{ $creator->email }}</a> </p>
             <p class="lead">Project title: <a href="/projects/{{ $project->id }}">{{ $project->name }}</a></p>
         </div>
         <br>
+        @if (!empty ($task->description))
+            <h4 class="text-center"> Task description </h4>
+            <p>{{ $task->description }}</p>
+            <br><br>
+        @endif
         @include('partials.comments')
 
         <form method="post" action="{{ route('comments.store') }}">
-            {{ csrf_field() }}
+            @csrf
 
             <input type="hidden" name="commentable_type" value="App\Models\Task">
             <input type="hidden" name="commentable_id" value="{{ $task->id }}">
 
             <div class="form-group">
-                <label for="comment-content" class="margin-heading">Comment:</label>
+                <label for="comment-content" class="mr-top-25">Comment:</label>
                 <textarea placeholder="Enter comment"
                           id="comment-content"
                           name="body" required
@@ -33,8 +40,7 @@
                           id="comment-content"
                           name="url"
                           rows="2" spellcheck="false"
-                          class="form-control form-control-lg">
-                            </textarea>
+                          class="form-control form-control-lg"></textarea>
             </div>
 
             <div class="form-group text-center">
@@ -65,7 +71,7 @@
                         <form id="delete-form" action="{{ route('tasks.destroy', [$task -> id]) }}"
                               method="POST" class="hidden">
                             <input type="hidden" name="_method" value="delete">
-                            {{ csrf_field() }}
+                            @csrf
                         </form>
                     </li>
                 @endif
@@ -73,7 +79,7 @@
             @if (Auth::check() && ($task->user_id == Auth::user()->id || Auth::user()->role_id == 1))
                 <h5>Add members:</h5>
                 <form id="add-user" action="{{ route('tasks.addUser') }}" method="POST">
-                    {{ csrf_field() }}
+                    @csrf
 
                     <div class="input-group">
                         <input class="form-control" name="task_id" value="{{ $task->id }}" type="hidden">

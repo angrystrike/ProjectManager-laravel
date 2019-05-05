@@ -24,10 +24,9 @@ class TasksRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'max:190',
-            'days' => 'int',
-            'hours' => 'int',
-            'duration' => 'required|int'
+            'name' => 'required|max:190',
+            'description' => 'max:190',
+            'days' => 'required|int',
         ];
     }
 }

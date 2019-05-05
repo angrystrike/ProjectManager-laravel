@@ -10,7 +10,7 @@
                         @foreach($users as $user)
                             <li class="list-group-item">
                                 <a href="/users/{{ $user->id }}">{{ $user->name }}</a>
-                                <button type="button" class="btn btn-danger btn-sm float-right margin-btn js-delete-user" data-id="{{ $user->id }}">
+                                <button type="button" class="btn btn-danger btn-sm float-right mr-left-8 js-delete-user" data-id="{{ $user->id }}">
                                     Delete
                                 </button>
                             </li>

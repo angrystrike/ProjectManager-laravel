@@ -10,13 +10,13 @@
                         @foreach($companies as $company)
                             <li class="list-group-item">
                                 <a href="/companies/{{ $company->id }}">{{ $company->name }}</a>
-                                <button type="button" class="btn btn-danger btn-sm float-right margin-btn js-delete">Delete</button>
+                                <button type="button" class="btn btn-danger btn-sm float-right mr-left-8 js-delete">Delete</button>
                                 <button type="button" class="btn btn-dark btn-sm float-right "><a href="/companies/{{ $company->id }}/edit" class="text-white">Edit</a></button>
 
                                 <form id="delete-form" action="{{ route('companies.destroy', [$company->id]) }}"
                                       method="POST" class="hidden">
                                       @method('delete')
-                                    {{ csrf_field() }}
+                                    @csrf
                                 </form>
                             </li>
                         @endforeach

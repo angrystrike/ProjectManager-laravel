@@ -211,8 +211,8 @@ $(document).ready(function () {
                 showMessage(".col-sm-10", "success", response.message);
                 let newLi = "<li class='list-group-item'>" +
                                 "<a href='/users/" + response.accepted_friend_id + "'>" + response.accepted_friend_email + "</a>" +
-                                "<button type='button' class='btn btn-danger float-right margin-btn js-delete-friend' data-friend_id=" + response.accepted_friend_id + ">Remove</button>" +
-                                "<button type='button' class='btn btn-success float-right margin-btn js-message-friend' data-recipient_id=" + response.accepted_friend_id + ">Write</button></li>" +
+                                "<button type='button' class='btn btn-danger float-right mr-left-8 js-delete-friend' data-friend_id=" + response.accepted_friend_id + ">Remove</button>" +
+                                "<button type='button' class='btn btn-success float-right mr-left-8 js-message-friend' data-recipient_id=" + response.accepted_friend_id + ">Write</button></li>" +
                              "</li>";
                 if ($("#friends ul").length) {
                     $("#friends ul").append(newLi);

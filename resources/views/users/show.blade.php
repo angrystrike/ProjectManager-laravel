@@ -26,7 +26,7 @@
                     <button type="button" class="btn btn-success">{{ $user->name }} is your friend</button>
                 @endif
             @endif
-            <button type="button" class="btn btn-primary margin-btn js-message-friend" data-recipient_id="{{ $user->id }}">Send message</button>
+            <button type="button" class="btn btn-primary mr-left-8 js-message-friend" data-recipient_id="{{ $user->id }}">Send message</button>
         </div>
         @if (count($jobProjects))
             <br>
@@ -62,7 +62,7 @@
                             <li class="list-group-item">
                                 <a href="/companies/{{ $company->id }}">{{ $company->name }}</a>
                                 @if (Auth::check() && (Auth::user()->id == $user->id || Auth::user()->role_id == 1))
-                                    <button type="button"class="btn btn-danger btn-sm float-right margin-btn js-delete">Delete</button>
+                                    <button type="button"class="btn btn-danger btn-sm float-right mr-left-8 js-delete">Delete</button>
                                     <button type="button" class="btn btn-dark btn-sm float-right">
                                         <a href="/companies/{{ $company->id }}/edit" class="text-white">Edit</a>
                                     </button>
@@ -70,7 +70,7 @@
                                 <form id="delete-form" action="{{ route('companies.destroy', [$company->id]) }}"
                                       method="POST" class="hidden">
                                     <input type="hidden" name="_method" value="delete">
-                                    {{ csrf_field() }}
+                                    @csrf
                                 </form>
                             </li>
                         @endforeach
@@ -90,7 +90,7 @@
                             <li class="list-group-item">
                                 <a href="/projects/{{ $project->id }}">{{ $project->name }}</a>
                                 @if (Auth::check() && (Auth::user()->id == $user->id || Auth::user()->role_id == 1))
-                                    <button type="button" class="btn btn-danger btn-sm float-right margin-btn js-delete">Delete</button>
+                                    <button type="button" class="btn btn-danger btn-sm float-right mr-left-8 js-delete">Delete</button>
                                     <button type="button" class="btn btn-dark btn-sm float-right ">
                                         <a href="/projects/{{ $project->id }}/edit" class="text-white">Edit</a>
                                     </button>
@@ -98,7 +98,7 @@
                                 <form id="delete-form" action="{{ route('projects.destroy', [$project->id]) }}"
                                       method="POST" class="hidden">
                                     <input type="hidden" name="_method" value="delete">
-                                    {{ csrf_field() }}
+                                    @csrf
                                 </form>
                             </li>
                         @endforeach
@@ -118,7 +118,7 @@
                             <li class="list-group-item">
                                 <a href="/tasks/{{ $task->id }}">{{ $task->name }}</a>
                                 @if (Auth::check() && (Auth::user()->id == $user->id || Auth::user()->role_id == 1))
-                                    <button type="button" class="btn btn-danger btn-sm float-right margin-btn js-delete">Delete</button>
+                                    <button type="button" class="btn btn-danger btn-sm float-right mr-left-8 js-delete">Delete</button>
                                     <button type="button" class="btn btn-dark btn-sm float-right">
                                         <a href="/tasks/{{ $task->id }}/edit" class="text-white">Edit</a>
                                     </button>
@@ -126,7 +126,7 @@
                                 <form id="delete-form" action="{{ route('tasks.destroy', [$task->id]) }}"
                                       method="POST" class="hidden">
                                     <input type="hidden" name="_method" value="delete">
-                                    {{ csrf_field() }}
+                                    @csrf
                                 </form>
                             </li>
                         @endforeach

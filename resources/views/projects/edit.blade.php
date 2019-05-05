@@ -3,7 +3,7 @@
 @section('content')
     <div class="col-sm-9">
             <form method="post" action="{{ route('projects.update', [$project->id]) }}">
-                {{ csrf_field() }}
+                @csrf
 
                 @method('put')
 

@@ -24,8 +24,8 @@
                                 @foreach($friends as $friend)
                                     <li class="list-group-item">
                                         <a href="/users/{{ $friend->id }}">{{ $friend->email }}</a>
-                                        <button type="button" class="btn btn-danger float-right margin-btn js-delete-friend" data-friend_id="{{ $friend->id }}">Remove</button>
-                                        <button type="button" class="btn btn-success float-right margin-btn js-message-friend" data-recipient_id="{{ $friend->id }}">Write</button>
+                                        <button type="button" class="btn btn-danger float-right mr-left-8 js-delete-friend" data-friend_id="{{ $friend->id }}">Remove</button>
+                                        <button type="button" class="btn btn-success float-right mr-left-8 js-message-friend" data-recipient_id="{{ $friend->id }}">Write</button>
                                     </li>
                                 @endforeach
                             </ul>
@@ -39,7 +39,7 @@
                                 @foreach($requests as $request)
                                     <li class="list-group-item">
                                         <a href="/users/{{ $request->sender_id }}">{{ $request->email }}</a>   {{ Carbon\Carbon::parse($request->created_at)->diffForHumans() }}
-                                        <button type="button" class="btn btn-danger float-right margin-btn js-deny-friend" data-sender_id="{{ $request->sender_id }}">Deny</button>
+                                        <button type="button" class="btn btn-danger float-right mr-left-8 js-deny-friend" data-sender_id="{{ $request->sender_id }}">Deny</button>
                                         <button type="button" class="btn btn-success float-right js-accept-friend" data-sender_id="{{ $request->sender_id }}">Accept</button>
                                     </li>
                                 @endforeach
@@ -54,7 +54,7 @@
                                 @foreach($sentRequests as $sentRequest)
                                     <li class="list-group-item">
                                         <a href="/users/{{ $sentRequest->recipient_id }}">{{ $sentRequest->email }}</a>   {{ Carbon\Carbon::parse($sentRequest->created_at)->diffForHumans() }}
-                                        <button type="button" class="btn btn-danger float-right margin-btn js-cancel-request" data-recipient_id="{{ $sentRequest->recipient_id }}">Cancel</button>
+                                        <button type="button" class="btn btn-danger float-right mr-left-8 js-cancel-request" data-recipient_id="{{ $sentRequest->recipient_id }}">Cancel</button>
                                         <button type="button" class="btn btn-success float-right js-message-friend" data-recipient_id="{{ $sentRequest->recipient_id }}">Write</button>
                                     </li>
                                 @endforeach

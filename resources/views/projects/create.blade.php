@@ -4,7 +4,7 @@
     <div class="col-sm-9 ">
         <h3 class="text-center">Create new Project</h3>
             <form method="post" action="{{ route('projects.store') }}">
-                {{ csrf_field() }}
+                @csrf
 
                 <div class="form-group">
                     <label for="project-name">Name:</label>

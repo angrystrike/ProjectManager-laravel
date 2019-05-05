@@ -4,7 +4,7 @@
     <div class="col-sm-9">
         <h3 class="text-center">Create new Company</h3>
             <form method="post" action="{{ route('companies.store') }}">
-                {{ csrf_field() }}
+                @csrf
 
                 <div class="form-group">
                     <label for="company-name">Name:</label>

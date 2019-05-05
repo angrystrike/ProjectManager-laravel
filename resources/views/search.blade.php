@@ -11,7 +11,7 @@
                 </form>
                 @if (!empty($search))
                     <div class="table-responsive">
-                        <h4 class="text-center margin-heading">Total matches found: {{ $totalCount }}</h4>
+                        <h4 class="text-center mr-top-25">Total matches found: {{ $totalCount }}</h4>
                         <table class="table table-striped table-bordered">
                             <thead>
                             <tr>

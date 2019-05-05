@@ -10,13 +10,13 @@
                         @foreach($projects as $project)
                             <li class="list-group-item">
                                 <a href="/projects/{{ $project->id }}">{{ $project->name }}</a>
-                                <button type="button" class="btn btn-danger btn-sm float-right margin-btn js-delete">Delete</button>
+                                <button type="button" class="btn btn-danger btn-sm float-right mr-left-8 js-delete">Delete</button>
                                 <button type="button" class="btn btn-dark btn-sm float-right "><a href="/projects/{{ $project->id }}/edit" class="text-white">Edit</a></button>
 
                                 <form id="delete-form" action="{{ route('projects.destroy', [$project->id]) }}"
                                       method="POST" class="hidden">
                                     @method('delete')
-                                    {{ csrf_field() }}
+                                    @csrf
                                 </form>
                             </li>
                         @endforeach

@@ -7,23 +7,23 @@
 .hidden {
     display: none;
 }
-.margin-heading {
+.mr-top-25 {
     margin-top: 20px;
 }
-.margin-bot {
+/*.mr-bot-25 {
     margin-bottom: 25px;
-}
-.margin-comments {
+}*/
+/*.mr-top-15 {
     margin-top: 15px;
-}
+}*/
 .vertical {
     resize: vertical;
 }
 body {
-    font-family: "Helvetica";
-    font-size: 16px;
+    font-family: Geneva, Arial, Helvetica, sans-serif;
+    font-size: 18px;
 }
-.margin-btn {
+.mr-left-8 {
     margin-left: 8px;
 }
 .bg-light-green {
@@ -31,4 +31,7 @@ body {
 }
 .mr-top-10 {
     margin-top: 10px;
+}
+.underline {
+    text-decoration: underline #2fa360;
 }

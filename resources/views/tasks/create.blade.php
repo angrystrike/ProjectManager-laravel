@@ -13,7 +13,7 @@
 
         <h3 class="text-center">Create new Task</h3>
         <form method="post" action="{{ route('tasks.store') }}">
-            {{ csrf_field() }}
+            @csrf
 
             <div class="form-group">
                 <label for="task-name">Name:</label>
@@ -26,6 +26,15 @@
                 />
             </div>
 
+            <div class="form-group">
+                <label for="task-description">Description:</label>
+                <textarea placeholder="Enter description"
+                          id="task-description"
+                          name="description"
+                          rows="5" spellcheck="false"
+                          class="form-control form-control-lg"></textarea>
+            </div>
+
             @if ($projects == null)
                 <input
                     class="form-control form-control-lg"
@@ -33,19 +42,37 @@
                     name="project_id"
                     value="{{ $project_id }}"
                 />
-
             @endif
 
             @if ($projects != null && count($projects) != 0)
                 <div class="form-group">
-                    <label for="project-content">Select Project:</label>
+                    <label>Select Project:</label>
                     <select name="project_id" class="form-control form-control-lg">
                         @foreach($projects as $project)
-                            <option value="{{$project->id}}"> {{$project->name}} </option>
+                            <option value="{{ $project->id }}">{{ $project->name }}</option>
                         @endforeach
                     </select>
                 </div>
             @endif
+
+            <div class="form-group">
+                <label for="task-kind">Type: </label>
+                <select name="kind" id="task-kind" class="form-control form-control-lg">
+                    <option>Proposal</option>
+                    <option>Enhancement</option>
+                    <option>Bug</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="task-priority">Priority: </label>
+                <select name="priority" id="task-priority" class="form-control form-control-lg">
+                    <option>Trivial</option>
+                    <option>Minor</option>
+                    <option>Major</option>
+                    <option>Critical</option>
+                </select>
+            </div>
 
             <div class="form-group">
                 <label for="task-days">Days:</label>
@@ -53,37 +80,9 @@
                        id="task-days"
                        type="number"
                        min="1"
-                       max="100"
+                       max="1000"
                        required
                        name="days"
-                       spellcheck="false"
-                       class="form-control form-control-lg"
-                />
-            </div>
-
-            <div class="form-group">
-                <label for="task-hours">Hours:</label>
-                <input placeholder="Enter hours"
-                       id="task-hours"
-                       type="number"
-                       min="1"
-                       max="1000"
-                       required
-                       name="hours"
-                       spellcheck="false"
-                       class="form-control form-control-lg"
-                />
-            </div>
-
-            <div class="form-group">
-                <label for="task-duration">Duration:</label>
-                <input placeholder="Enter duration"
-                       id="task-duration"
-                       type="number"
-                       min="1"
-                       max="1000"
-                       required
-                       name="duration"
                        spellcheck="false"
                        class="form-control form-control-lg"
                 />

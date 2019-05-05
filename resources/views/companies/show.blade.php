@@ -22,13 +22,13 @@
         @include('partials.comments')
 
         <form method="post" action="{{ route('comments.store') }}">
-            {{ csrf_field() }}
+            @csrf
 
             <input type="hidden" name="commentable_type" value="App\Models\Company">
             <input type="hidden" name="commentable_id" value="{{ $company->id }}">
 
             <div class="form-group">
-                <label for="comment-content" class="margin-heading">Comment:</label>
+                <label for="comment-content" class="mr-top-25">Comment:</label>
                 <textarea placeholder="Enter comment"
                           id="comment-content"
                           required
@@ -74,7 +74,7 @@
                     <form id="delete-form" action="{{ route('companies.destroy', [$company->id]) }}"
                           method="POST" class="hidden">
                         @method('delete')
-                        {{ csrf_field() }}
+                        @csrf
                     </form>
                 </li>
             @endif

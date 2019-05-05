@@ -2,7 +2,6 @@
 
 @section('content')
     <div class="col-sm-9">
-
         <div class="jumbotron text-center">
             <h1>{{ $project->name }}</h1>
             <p class="lead">{{ $project->description }}</p>
@@ -29,13 +28,13 @@
         @include('partials.comments')
 
         <form method="post" action="{{ route('comments.store') }}">
-            {{ csrf_field() }}
+            @csrf
 
             <input type="hidden" name="commentable_type" value="App\Models\Project">
             <input type="hidden" name="commentable_id" value="{{ $project->id }}">
 
             <div class="form-group">
-                <label for="comment-content" class="margin-heading">Comment:</label>
+                <label for="comment-content" class="mr-top-25">Comment:</label>
                 <textarea placeholder="Enter comment"
                           id="comment-content"
                           name="body" required
@@ -82,7 +81,7 @@
                         <form id="delete-form" action="{{ route('projects.destroy', [$project->id]) }}"
                               method="POST" class="hidden">
                             @method('delete')
-                            {{ csrf_field() }}
+                            @csrf
                         </form>
                     </li>
                 @endif
@@ -90,7 +89,7 @@
             @if (Auth::check() && ($project->user_id == Auth::user()->id || Auth::user()->role_id == 1))
                 <h5>Add members:</h5>
                 <form id="add-user" action="{{ route('projects.addUser') }}" method="POST">
-                    {{ csrf_field() }}
+                    @csrf
 
                     <div class="input-group">
                         <input class="form-control" name="project_id" value="{{ $project->id }}" type="hidden">
