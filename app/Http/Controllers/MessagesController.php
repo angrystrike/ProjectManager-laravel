@@ -10,6 +10,7 @@ use Cmgmyr\Messenger\Models\Thread;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 
@@ -31,7 +32,6 @@ class MessagesController extends Controller
 
             return redirect()->route('messages');
         }
-
         $userId = Auth::id();
         $users = User::whereNotIn('id', $thread->participantsUserIds($userId))->get();
 
@@ -46,9 +46,47 @@ class MessagesController extends Controller
         return view('messages.create', compact('users'));
     }
 
+    public function currentParticipants($thread_id)
+    {
+        $participants = DB::table('users')
+            ->select('users.id', 'users.email', 'users.name', 'participants.last_read', 'participants.created_at')
+            ->join('participants', 'users.id', '=', 'participants.user_id')
+            ->where('participants.thread_id', '=', $thread_id)
+            ->where('participants.user_id', '!=', Auth::id())
+            ->get();
+
+        $thread = Thread::where('id', $thread_id)->first();
+        if ($thread->creator()->id == Auth::id()) {
+            $isCreator = true;
+        }
+        else {
+            $isCreator = false;
+        }
+        return view('messages.participants', ['participants' => $participants, 'thread_id' => $thread_id, 'isCreator' => $isCreator]);
+    }
+
+    public function kickFromThread($thread_id, $user_id)
+    {
+        $thread = Thread::where('id', $thread_id)->first();
+
+        if ($thread->creator()->id != Auth::id()) {
+            return response()->json(['message' => 'Not enough credentials for this action']);
+        }
+        else if ($user_id == Auth::id()) {
+            return response()->json(['message' => 'You cannot kick yourself']);
+        }
+
+        DB::table('participants')
+            ->where('thread_id', $thread_id)
+            ->where('user_id', $user_id)
+            ->delete();
+
+        return response()->json(['message' => 'Member was kicked']);
+    }
+
     public function store(Request $request)
     {
-       $request->validate([
+        $request->validate([
             'subject' => 'required|max:190',
             'message' => 'max:5000'
         ]);

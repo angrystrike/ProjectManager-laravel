@@ -17,7 +17,10 @@ class ProjectsController extends Controller
 {
     public function deleteMember($project_id, $user_id)
     {
-        ProjectUser::where('project_id', $project_id)->where('user_id', $user_id)->delete();
+        ProjectUser::where('project_id', $project_id)
+            ->where('user_id', $user_id)
+            ->delete();
+
         return response()->json([
             'message' => 'Project member was removed'
         ]);

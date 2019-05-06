@@ -9,6 +9,37 @@ $(function() {
 });
 
 $(document).ready(function () {
+   $(document).on("click", ".js-kick-from-thread", function () {
+      let user_id = $(this).data("id");
+      let thread_id = $(this).data("thread_id");
+      let parent = $(this).closest(".card");
+      let token = $("meta[name='csrf-token']").attr("content");
+
+      vex.dialog.confirm({
+          message: 'Kick member?',
+          callback: function (value) {
+              if (value){
+                  $.ajax({
+                      url: '/threads/' + thread_id + '/kickMember/' + user_id,
+                      type: 'DELETE',
+                      data: {
+                          "_token": token
+                      },
+                      success: function (response) {
+                          showMessage(".col-sm-9", "success", response.message);
+                          parent.remove();
+                      },
+                      error: function (response) {
+                          showMessage(".col-sm-9", "danger", response.responseJSON.message);
+                      }
+                  });
+              }
+          }
+      });
+   });
+});
+
+$(document).ready(function () {
    $(document).on("click", ".js-delete-message", function () {
        let id = $(this).data("id");
        let parent = $(this).closest(".card");

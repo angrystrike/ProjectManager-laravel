@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\DB;
 
 class UsersController extends Controller
 {
-
     public function all()
     {
         $users = User::where('role_id', '!=', 1)->get();

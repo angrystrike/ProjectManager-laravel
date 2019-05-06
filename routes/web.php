@@ -21,6 +21,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('comments/update', 'CommentsController@update')->name('comments.update');
     Route::resource('comments', 'CommentsController')->only(['store', 'destroy']);
 
+    Route::delete('threads/{thread_id}/kickMember/{user_id}', 'MessagesController@kickFromThread')->name('messages.kickMember');
+    Route::get('threads/{thread_id}/participants', 'MessagesController@currentParticipants')->name('messages.currentParticipants');
     Route::delete('threads/{thread_id}', 'MessagesController@deleteThread')->name('threads.delete');
     Route::delete('messages/{id}', 'MessagesController@destroy')->name('messages.destroy');
     Route::put('messages', 'MessagesController@edit')->name('messages.edit');

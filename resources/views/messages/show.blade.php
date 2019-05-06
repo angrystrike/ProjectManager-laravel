@@ -13,6 +13,7 @@
             <h4>Actions: </h4>
             <li class="list-group-item"><a href="/messages">My Messages</a></li>
             <li class="list-group-item"><a href="/messages/create">New Message</a></li>
+            <li class="list-group-item"><a href="/threads/{{ $thread->id }}/participants">View current participants</a></li>
         </ul>
     </div>
 @endsection
