@@ -148,13 +148,19 @@ class UsersController extends Controller
 
     public function friendListInfo()
     {
-        $requests = DB::select(DB::raw("SELECT u.email, f.sender_id, f.status, f.created_at
-                                        FROM users u JOIN friendships f ON u.id = f.sender_id
-                                        WHERE f.recipient_id = ".Auth::id()." AND f.status = 0"));
+        $requests = DB::table('users')
+            ->select('users.email', 'friendships.sender_id', 'friendships.status', 'friendships.created_at')
+            ->join('friendships', 'users.id', 'friendships.sender_id')
+            ->where('friendships.recipient_id', Auth::id())
+            ->where('friendships.status', 0)
+            ->get();
 
-        $sentRequests = DB::select(DB::raw("SELECT u.email, f.recipient_id, f.status, f.created_at
-                                            FROM users u JOIN friendships f ON u.id = f.recipient_id
-                                            WHERE f.sender_id = ".Auth::id()." AND f.status = 0"));
+        $sentRequests = DB::table('users')
+            ->select('users.email', 'friendships.recipient_id', 'friendships.status', 'friendships.created_at')
+            ->join('friendships', 'users.id', 'friendships.recipient_id')
+            ->where('friendships.sender_id', Auth::id())
+            ->where('friendships.status', 0)
+            ->get();
 
         $friends = Auth::user()->getFriends();
 

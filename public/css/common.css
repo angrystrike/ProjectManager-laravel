@@ -10,12 +10,6 @@
 .mr-top-25 {
     margin-top: 20px;
 }
-/*.mr-bot-25 {
-    margin-bottom: 25px;
-}*/
-/*.mr-top-15 {
-    margin-top: 15px;
-}*/
 .vertical {
     resize: vertical;
 }
@@ -34,4 +28,13 @@ body {
 }
 .underline {
     text-decoration: underline #2fa360;
+}
+.form-control-borderless {
+    border: none;
+}
+
+.form-control-borderless:hover, .form-control-borderless:active, .form-control-borderless:focus {
+    border: none;
+    outline: none;
+    box-shadow: none;
 }

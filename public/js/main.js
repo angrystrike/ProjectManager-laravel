@@ -44,6 +44,7 @@ $(document).ready(function () {
        let id = $(this).data("id");
        let parent = $(this).closest(".card");
        let token = $("meta[name='csrf-token']").attr("content");
+
        vex.dialog.confirm ({
            message: 'Delete message?',
            callback: function (value) {

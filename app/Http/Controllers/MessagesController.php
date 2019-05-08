@@ -53,7 +53,7 @@ class MessagesController extends Controller
             ->join('participants', 'users.id', '=', 'participants.user_id')
             ->where('participants.thread_id', '=', $thread_id)
             ->where('participants.user_id', '!=', Auth::id())
-            ->get();
+            ->paginate(3);
 
         $thread = Thread::where('id', $thread_id)->first();
         if ($thread->creator()->id == Auth::id()) {
@@ -62,6 +62,7 @@ class MessagesController extends Controller
         else {
             $isCreator = false;
         }
+
         return view('messages.participants', ['participants' => $participants, 'thread_id' => $thread_id, 'isCreator' => $isCreator]);
     }
 
