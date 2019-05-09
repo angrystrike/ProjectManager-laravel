@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProjectsRequest;
+use App\Mail\UserAttachedToProject;
+use App\Mail\UserRemovedFromProject;
 use App\Models\Comment;
 use App\Models\Company;
 use App\Models\Project;
@@ -12,6 +14,7 @@ use App\Models\User;
 use App\Models\ProjectUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class ProjectsController extends Controller
 {
@@ -20,6 +23,10 @@ class ProjectsController extends Controller
         ProjectUser::where('project_id', $project_id)
             ->where('user_id', $user_id)
             ->delete();
+
+        $user = User::where('id', $user_id)->first();
+        $project = Project::where('id', $project_id)->first();
+        Mail::to($user)->send(new UserRemovedFromProject($project));
 
         return response()->json([
             'message' => 'Project member was removed'
@@ -43,12 +50,14 @@ class ProjectsController extends Controller
 
             if ($projectUser) {
                 return redirect()->route('projects.show', ['project' => $project])
-                    ->with('errors', $request->input('email') . ' is already a member of this project');
+                    ->with('errors', $request->input('email') . ' is already a member of this Project');
             }
 
             $project->users()->attach($user->id);
+            Mail::to($user)->send(new UserAttachedToProject($project));
+
             return redirect()->route('projects.show', ['project' => $project])
-                ->with('success', $request->input('email') . ' was added to Project successfully');
+                ->with('success', $request->input('email') . ' was added to Project successfully and was notified via email');
         }
         return redirect()->route('projects.show', ['project' => $project])
             ->with('errors', 'Invalid action');

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\TasksRequest;
+use App\Mail\UserAttachedToTask;
+use App\Mail\UserRemovedFromTask;
 use App\Models\Comment;
 use App\Models\Project;
 use App\Models\Task;
@@ -10,15 +12,21 @@ use App\Models\TaskUser;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class TasksController extends Controller
 {
     public function deleteMember($task_id, $user_id)
     {
-       TaskUser::where('task_id', $task_id)->where('user_id', $user_id)->delete();
-        return response()->json([
-            'message' => 'Task member was removed'
-        ]);
+        TaskUser::where('task_id', $task_id)
+            ->where('user_id', $user_id)
+            ->delete();
+
+        $user = User::where('id', $user_id)->first();
+        $task = Task::where('id', $task_id)->first();
+        Mail::to($user)->send(new UserRemovedFromTask($task));
+
+        return response()->json(['message' => 'Task member was removed and was notified via email']);
     }
 
     public function addUser(Request $request)
@@ -42,8 +50,10 @@ class TasksController extends Controller
             }
 
             $task->users()->attach($user->id);
+            Mail::to($user)->send(new UserAttachedToTask($task));
+
             return redirect()->route('tasks.show', ['task' => $task])
-                ->with('success', $request->input('email') . ' was added for this Task successfully');
+                ->with('success', $request->input('email') . ' was added for this Task successfully and notified via email');
         }
         return redirect()->route('tasks.show', ['task' => $task])
             ->with('errors', 'Invalid action');

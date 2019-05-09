@@ -19,10 +19,10 @@ class SearchController
     {
         $search = $request->input('search');
 
-        $companies = Company::where('name', 'LIKE', '%' . $search . '%')->get();
-        $projects = Project::where('name', 'LIKE', '%' . $search . '%')->get();
-        $tasks = Task::where('name', 'LIKE', '%' . $search . '%')->get();
-        $users = User::where('name', 'LIKE', '%' . $search . '%')->get();
+        $companies = Company::where('name', 'LIKE', "%{$search}%")->get();
+        $projects = Project::where('name', 'LIKE', "%{$search}%")->get();
+        $tasks = Task::where('name', 'LIKE', "%{$search}%")->get();
+        $users = User::where('name', 'LIKE', "%{$search}%")->get();
 
         $totalCount = count($companies) + count($projects) + count($tasks) + count($users);
         $rowsAmount = max(count($users), count($companies), count($projects), count($tasks));
