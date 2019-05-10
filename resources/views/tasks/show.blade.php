@@ -17,40 +17,12 @@
             <p>{{ $task->description }}</p>
             <br><br>
         @endif
+
         @include('partials.comments')
 
-        <form method="post" action="{{ route('comments.store') }}">
-            @csrf
-
-            <input type="hidden" name="commentable_type" value="App\Models\Task">
-            <input type="hidden" name="commentable_id" value="{{ $task->id }}">
-
-            <div class="form-group">
-                <label for="comment-content" class="mr-top-25">Comment:</label>
-                <textarea placeholder="Enter comment"
-                          id="comment-content"
-                          name="body" required
-                          rows="3" spellcheck="false"
-                          class="form-control form-control-lg"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="comment-content">Proof of work done (Url/Photos):</label>
-                <textarea placeholder="Enter url or screenshots"
-                          id="comment-content"
-                          name="url"
-                          rows="2" spellcheck="false"
-                          class="form-control form-control-lg"></textarea>
-            </div>
-
-            <div class="form-group text-center">
-                <input type="submit" class="btn btn-primary btn-block"
-                       value="Submit"/>
-            </div>
-        </form>
+        @include('partials.new-comment-form', ["type" => "App\Models\Task", "id" => $task->id])
 
     </div>
-
 
     <div class="col-sm-3">
         <div class="sidebar-module">
@@ -68,14 +40,15 @@
                             <i class="fas fa-trash"></i> Delete
                         </a>
 
-                        <form id="delete-form" action="{{ route('tasks.destroy', [$task -> id]) }}"
+                        <form id="delete-form" action="{{ route('tasks.destroy', [$task->id]) }}"
                               method="POST" class="hidden">
-                            <input type="hidden" name="_method" value="delete">
+                            @method('delete')
                             @csrf
                         </form>
                     </li>
                 @endif
             </ol>
+
             @if (Auth::check() && ($task->user_id == Auth::user()->id || Auth::user()->role_id == 1))
                 <h5>Add members:</h5>
                 <form id="add-user" action="{{ route('tasks.addUser') }}" method="POST">
@@ -93,25 +66,24 @@
                 </form>
                 <br>
             @endif
-            <h5>Current members:</h5>
-            <ul class="list-group">
-                @if (count($task->users) > 0)
+
+            @if (count($task->users) > 0)
+                <h5>Current members:</h5>
+                <ul class="list-group">
                     @foreach($task->users as $user)
-                        <li class="list-group-item "><a href="/users/{{$user->id}}">{{ $user->email }}</a>
-                            @if (Auth::check() && ($task->user_id == Auth::user()->id || Auth::user()->role_id == 1))
-                                <button type="button"
-                                        class="btn btn-primary btn-sm js-delete-task-member btn-danger float-right"
+                        <li class="list-group-item"><a href="/users/{{$user->id}}">{{ $user->email }}</a>
+                            @if (Auth::check() && $task->user_id == Auth::id())
+                                <button type="button" class="btn btn-primary btn-sm js-delete-task-member btn-danger float-right"
                                         data-task_id="{{ $task->id }}" data-user_id="{{ $user->id }}">Remove
                                 </button>
                             @endif
                         </li>
                     @endforeach
-                @else
-                    <h6 class="text-muted">No active members yet</h6>
-                @endif
-            </ul>
+                </ul>
+            @else
+                <h6 class="text-muted">No active members yet</h6>
+            @endif
         </div>
     </div>
-
 @endsection
 

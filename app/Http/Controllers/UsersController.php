@@ -14,7 +14,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-
 class UsersController extends Controller
 {
     public function all()
@@ -25,26 +24,12 @@ class UsersController extends Controller
 
     public function show(User $user)
     {
-        $companies = Company::where('user_id', $user->id)->get();
-        $projects = Project::where('user_id', $user->id)->get();
-        $tasks = Task::where('user_id', $user->id)->get();
-        $comments = Comment::where('user_id', $user->id)->paginate(3);
-
-        $projectUsers = ProjectUser::where('user_id', $user->id)->get();
-        $jobProjects = [];
-        if (count($projectUsers) > 0) {
-            foreach ($projectUsers as $projectUser) {
-                array_push($jobProjects, Project::where('id', $projectUser->project_id)->first());
-            }
-        }
-
-        $taskUsers = TaskUser::where('user_id', $user->id)->get();
-        $jobTasks = [];
-        if (count($taskUsers) > 0) {
-            foreach ($taskUsers as $taskUser) {
-                array_push($jobTasks, Task::where('id', $taskUser->task_id)->first());
-            }
-        }
+        $companies = Company::findByUserId($user->id);
+        $projects = Project::findByUserId($user->id);
+        $tasks = Task::findByUserId($user->id);
+        $comments = Comment::findByUserIdAndPaginate($user->id, 3);
+        $jobProjects = ProjectUser::userJobProjects($user->id);
+        $jobTasks = TaskUser::userJobTasks($user->id);
 
         $tmp1 = Friendship::where('sender_id', Auth::id())->where('recipient_id', $user->id)->first();
         $tmp2 = Friendship::where('sender_id', $user->id)->where('recipient_id', Auth::id())->first();
@@ -66,43 +51,26 @@ class UsersController extends Controller
         }
 
         return view('users.show', ['user' => $user, 'companies' => $companies,
-                                        'projects' => $projects, 'tasks' => $tasks,
-                                        'comments' => $comments, 'jobProjects' => $jobProjects,
-                                        'jobTasks' => $jobTasks, 'state' => $relationshipState]);
+            'projects' => $projects, 'tasks' => $tasks,
+            'comments' => $comments, 'jobProjects' => $jobProjects,
+            'jobTasks' => $jobTasks, 'state' => $relationshipState]);
     }
 
     public function destroy(User $user)
     {
-        Comment::where('user_id', $user->id)->delete();
-        ProjectUser::where('user_id', $user->id)->delete();
-        TaskUser::where('user_id', $user->id)->delete();
-        Task::where('user_id', $user->id)->delete();
-        Project::where('user_id', $user->id)->delete();
-        Company::where('user_id', $user->id)->delete();
-
         $user->delete();
-
         return response()->json(['message' => 'User deleted successfully']);
     }
 
     public function deleteFriend(Request $request)
     {
-        Friendship::where('sender_id', Auth::id())
-            ->where('recipient_id', $request->input('friend_id'))
-            ->where('status', 1)
-            ->delete();
-
-        Friendship::where('sender_id', $request->input('friend_id'))
-            ->where('recipient_id', Auth::id())
-            ->where('status', 1)
-            ->delete();
-
+        User::deleteFriend($request->input('friend_id'));
         return response()->json(['message' => 'That user was deleted from your friend list']);
     }
 
     public function denyFriend(Request $request)
     {
-        $sender = User::where('id', $request->input('sender_id'))->first();
+        $sender = User::find($request->input('sender_id'));
         Auth::user()->denyFriendRequest($sender);
 
         return response()->json(['message' => 'Friend request was denied']);
@@ -110,29 +78,23 @@ class UsersController extends Controller
 
     public function cancelFriendRequest(Request $request)
     {
-        Friendship::where('sender_id', Auth::id())
-            ->where('recipient_id', $request->input('recipient_id'))
-            ->where('status', 0)
-            ->delete();
-
+        User::cancelFriendRequest($request->input('recipient_id'));
         return response()->json(['message' => 'Friend request was canceled']);
     }
 
     public function addToFriends(Request $request)
     {
-        $sender = User::where('id', Auth::id())->first();
-        $recipient = User::where('id', $request->input('recipient_id'))->first();
-        $sender->befriend($recipient);
+        $recipient = User::find($request->input('recipient_id'));
+        Auth::user()->befriend($recipient);
 
         return response()->json(['message' => 'Friend request was successfully sent']);
     }
 
     public function acceptFriend(Request $request)
     {
-        $sender = User::where('id', $request->input('sender_id'))->first();
-        $recipient = User::where('id', Auth::id())->first();
+        $sender = User::find($request->input('sender_id'));
+        Auth::user()->acceptFriendRequest($sender);
 
-        $recipient->acceptFriendRequest($sender);
         Friendship::where('sender_id', $request->input('sender_id'))
             ->where('recipient_id', Auth::id())
             ->update([
@@ -148,22 +110,10 @@ class UsersController extends Controller
 
     public function friendListInfo()
     {
-        $requests = DB::table('users')
-            ->select('users.email', 'friendships.sender_id', 'friendships.status', 'friendships.created_at')
-            ->join('friendships', 'users.id', 'friendships.sender_id')
-            ->where('friendships.recipient_id', Auth::id())
-            ->where('friendships.status', 0)
-            ->get();
-
-        $sentRequests = DB::table('users')
-            ->select('users.email', 'friendships.recipient_id', 'friendships.status', 'friendships.created_at')
-            ->join('friendships', 'users.id', 'friendships.recipient_id')
-            ->where('friendships.sender_id', Auth::id())
-            ->where('friendships.status', 0)
-            ->get();
-
+        $inComingRequests = User::findInComingFriendRequests(Auth::id());
+        $outComingRequest = User::findOutComingFriendRequests(Auth::id());
         $friends = Auth::user()->getFriends();
 
-        return view('users.friends', ['requests' => $requests, 'friends' => $friends, 'sentRequests' => $sentRequests]);
+        return view('users.friends', ['requests' => $inComingRequests, 'friends' => $friends, 'sentRequests' => $outComingRequest]);
     }
 }

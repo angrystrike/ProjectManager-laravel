@@ -25,11 +25,13 @@ class MessagesController extends Controller
 
     public function show($id)
     {
-        try {
+        try
+        {
             $thread = Thread::findOrFail($id);
-        } catch (ModelNotFoundException $e) {
+        }
+        catch (ModelNotFoundException $e)
+        {
             Session::flash('errors', 'The thread with ID: ' . $id . ' was not found.');
-
             return redirect()->route('messages');
         }
         $userId = Auth::id();
@@ -68,7 +70,7 @@ class MessagesController extends Controller
 
     public function kickFromThread($thread_id, $user_id)
     {
-        $thread = Thread::where('id', $thread_id)->first();
+        $thread = Thread::find($thread_id);
 
         if ($thread->creator()->id != Auth::id()) {
             return response()->json(['message' => 'Not enough credentials for this action']);

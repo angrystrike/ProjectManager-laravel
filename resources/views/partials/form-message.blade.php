@@ -9,7 +9,7 @@
 
     <h4 class="text-center">Invite new participants</h4>
     @if($users->count() > 0)
-        <div class="card margin-bot">
+        <div class="card">
             <div class="card-header">
                 <strong>Chat participants:</strong>
             </div>
@@ -18,7 +18,7 @@
                     <label for="multipleSelect">Choose receivers: </label>
                     <select style="width: 100%" name="recipients[]" class="form-control form-control-lg" id="multipleSelect" data-placeholder="Select an option" multiple>
                         @foreach ($users as $user)
-                            <option value="{{ $user->id }}">{!!$user->name!!}</option>
+                            <option value="{{ $user->id }}">{{ $user->name }}</option>
                         @endforeach
                     </select>
                 </div>

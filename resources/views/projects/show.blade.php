@@ -24,38 +24,9 @@
             @endforeach
         </div>
 
-
         @include('partials.comments')
 
-        <form method="post" action="{{ route('comments.store') }}">
-            @csrf
-
-            <input type="hidden" name="commentable_type" value="App\Models\Project">
-            <input type="hidden" name="commentable_id" value="{{ $project->id }}">
-
-            <div class="form-group">
-                <label for="comment-content" class="mr-top-25">Comment:</label>
-                <textarea placeholder="Enter comment"
-                          id="comment-content"
-                          name="body" required
-                          rows="3" spellcheck="false"
-                          class="form-control form-control-lg"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="comment-content">Proof of work done (Url/Photos):</label>
-                <textarea placeholder="Enter url or screenshots"
-                          id="comment-content"
-                          name="url"
-                          rows="2" spellcheck="false"
-                          class="form-control form-control-lg"></textarea>
-            </div>
-
-            <div class="form-group text-center">
-                <input type="submit" class="btn btn-primary btn-block"
-                       value="Submit"/>
-            </div>
-        </form>
+        @include('partials.new-comment-form', ["type" => "App\Models\Project", "id" => $project->id])
 
     </div>
 

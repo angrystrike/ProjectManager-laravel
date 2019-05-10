@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Controllers;
 
 use App\Models\Company;
@@ -10,8 +9,6 @@ use App\Models\User;
 use Cmgmyr\Messenger\Models\Thread;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-
 
 class SearchController
 {
@@ -37,17 +34,10 @@ class SearchController
     public function findParticipants(Request $request, $thread_id)
     {
         $search = $request->input('search');
-
-        $result = DB::table('users')
-            ->select('users.id', 'users.email', 'users.name', 'participants.last_read', 'participants.created_at')
-            ->join('participants', 'users.id', '=', 'participants.user_id')
-            ->where('participants.thread_id', '=', $thread_id)
-            ->where('users.name', 'LIKE', "%{$search}%")
-            ->orWhere('users.email', 'LIKE', "%{$search}%")
-            ->get();
+        $result = User::findThreadParticipants($thread_id, $search);
         $result = $result->unique('email')->where('id', '!=', Auth::id());
 
-        $thread = Thread::where('id', $thread_id)->first();
+        $thread = Thread::find($thread_id);
         if ($thread->creator()->id == Auth::id()) {
             $isCreator = true;
         }
@@ -55,6 +45,7 @@ class SearchController
             $isCreator = false;
         }
 
-        return view('messages.participants', ['result' => $result, 'matchesCount' => count($result), 'search' => $search, 'isCreator' => $isCreator]);
+        return view('messages.participants', ['result' => $result, 'matchesCount' => count($result),
+                                                    'search' => $search, 'isCreator' => $isCreator]);
     }
 }

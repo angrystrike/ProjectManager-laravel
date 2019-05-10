@@ -18,12 +18,9 @@ class TasksController extends Controller
 {
     public function deleteMember($task_id, $user_id)
     {
-        TaskUser::where('task_id', $task_id)
-            ->where('user_id', $user_id)
-            ->delete();
-
-        $user = User::where('id', $user_id)->first();
-        $task = Task::where('id', $task_id)->first();
+        TaskUser::findOneByUserIdAndTaskId($user_id, $task_id)->delete();
+        $user = User::find($user_id);
+        $task = Task::find($task_id);
         Mail::to($user)->send(new UserRemovedFromTask($task));
 
         return response()->json(['message' => 'Task member was removed and was notified via email']);
@@ -40,9 +37,7 @@ class TasksController extends Controller
                     ->with('errors', $request->input('email').' doesnt exist');
             }
 
-            $taskUser = TaskUser::where('user_id', $user->id)
-                ->where('task_id', $task->id)
-                ->first();
+            $taskUser = TaskUser::findOneByUserIdAndTaskId($user->id, $task->id);
 
             if ($taskUser) {
                 return redirect()->route('tasks.show', ['task' => $task])
@@ -55,6 +50,7 @@ class TasksController extends Controller
             return redirect()->route('tasks.show', ['task' => $task])
                 ->with('success', $request->input('email') . ' was added for this Task successfully and notified via email');
         }
+
         return redirect()->route('tasks.show', ['task' => $task])
             ->with('errors', 'Invalid action');
     }
@@ -69,7 +65,7 @@ class TasksController extends Controller
     {
         $tasks = null;
         if (Auth::check()) {
-            $tasks = Task::where('user_id', Auth::user()->id)->get();
+            $tasks = Task::findByUserId(Auth::id());
         }
         return view('tasks.index', ['tasks' => $tasks]);
     }
@@ -79,7 +75,7 @@ class TasksController extends Controller
     {
         $projects = null;
         if (!$project_id) {
-            $projects = Project::where('user_id', Auth::user()->id)->get();
+            $projects = Project::findByUserId(Auth::id());
         }
 
         return view('tasks.create', ['project_id' => $project_id, 'projects' => $projects]);
@@ -111,13 +107,12 @@ class TasksController extends Controller
 
     public function show(Task $task)
     {
-        $comments = Comment::where('commentable_type', 'App\Models\Task')
-            ->where('commentable_id', $task->id)
-            ->paginate(3);
-        $creator = User::where('id', $task->user_id)->first();
-        $project = Project::where('id', $task->project_id)->first();
+        $itemsPerPage = 3;
+        $comments = Comment::findByIdAndType('App\Models\Task',  $task->id, $itemsPerPage);
+        $creator = User::find($task->user_id);
+        $project = Project::find($task->project_id);
 
-        return view('tasks.show', ['task' => $task, 'comments' => $comments, 'creator' => $creator, 'project' => $project ]);
+        return view('tasks.show', ['task' => $task, 'comments' => $comments, 'creator' => $creator, 'project' => $project]);
     }
 
 
@@ -130,37 +125,31 @@ class TasksController extends Controller
     {
         $request->validated();
 
-        $taskUpdate = Task::where('id', $task->id)
-            ->update([
-                'name' => $request->input('name'),
-                'description' => $request->input('description'),
-                'kind' => $request->input('kind'),
-                'priority' => $request->input('priority'),
-                'days' => $request->input('days'),
-            ]);
+        $taskUpdate = $task->update([
+            'name' => $request->input('name'),
+            'description' => $request->input('description'),
+            'kind' => $request->input('kind'),
+            'priority' => $request->input('priority'),
+            'days' => $request->input('days'),
+        ]);
 
         if ($taskUpdate) {
             return redirect()->route('tasks.show', ['task' => $task->id])
                 ->with('success' , 'Task updated successfully');
         }
+
         return back()->withInput();
     }
 
     public function destroy(Task $task)
     {
-        TaskUser::where('task_id', $task->id)->delete();
+        $task->delete();
+        Comment::deleteByTypeAndId('App\Models\Task', $task->id);
 
-        if ($task && $task->delete()) {
-
-            if (Auth::user()->role_id == 1) {
-                return redirect()->route('admin.tasks')
-                    ->with('success' , 'Task deleted successfully');
-            }
-
-            return redirect()->route('tasks.index')
-                ->with('success' , 'Task deleted successfully');
+        if (Auth::user()->role_id == 1) {
+            return redirect()->route('admin.tasks')->with('success' , 'Task deleted successfully');
         }
 
-        return back()->withInput()->with('errors' , 'Task could not be deleted');
+        return redirect()->route('tasks.index')->with('success' , 'Task deleted successfully');
     }
 }

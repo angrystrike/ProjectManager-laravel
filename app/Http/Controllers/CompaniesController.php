@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CompanyRequest;
 use App\Models\Comment;
-use App\Models\Company;
-use App\Models\Project;
-use App\Models\Task;
+use App\Models\Company;;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,7 +20,7 @@ class CompaniesController extends Controller
     {
         $companies = null;
         if (Auth::check()) {
-            $companies = Company::where('user_id', Auth::user()->id)->get();
+            $companies = Company::findByUserId(Auth::id());
         }
         return view('companies.index', ['companies' => $companies]);
     }
@@ -35,29 +33,18 @@ class CompaniesController extends Controller
     public function store(CompanyRequest $request)
     {
         $request->validated();
+        $company = Company::createOne($request->input('name'), $request->input('description'), Auth::id());
 
-        $company = Company::create([
-            'name' => $request->input('name'),
-            'description' => $request->input('description'),
-            'user_id' => Auth::user()->id
-        ]);
-
-        if ($company) {
-            return redirect()->route('companies.show', ['company' => $company->id])
-                ->with('success', 'Company created successfully');
-        }
-
-
-        return back()->withInput()->with('errors', 'Error creating new Company');
+        return redirect()->route('companies.show', ['company' => $company])
+            ->with('success', 'Company created successfully');
     }
 
     public function show(Company $company)
     {
-        $comments = Comment::where('commentable_type', 'App\Models\Company')
-            ->where('commentable_id', $company->id)
-            ->paginate(4);
+        $itemsPerPage = 4;
+        $comments = Comment::findByIdAndType('App\Models\Company', $company->id, $itemsPerPage);
+        $creator = User::find($company->user_id);
 
-        $creator = User::where('id', $company->user_id)->first();
         return view('companies.show', ['company' => $company, 'comments' => $comments, 'creator' => $creator]);
     }
 
@@ -66,44 +53,27 @@ class CompaniesController extends Controller
         return view('companies.edit', ['company' => $company]);
     }
 
-
     public function update(CompanyRequest $request, Company $company)
     {
         $request->validated();
 
-        $companyUpdate = Company::where('id', $company->id)
-            ->update([
+        $company->update([
                 'name' => $request->input('name'),
                 'description' => $request->input('description'),
             ]);
 
-        if ($companyUpdate) {
-            return redirect()->route('companies.show', ['company' => $company->id])
-                ->with('success', 'Company updated successfully');
-        }
-
-        return back()->withInput();
+        return redirect()->route('companies.show', ['company' => $company])
+            ->with('success', 'Company updated successfully');
     }
 
     public function destroy(Company $company)
     {
-        Project::where('company_id', '=', $company->id)
-            ->update([
-                'company_id' => null
-            ]);
+        $company->delete();
+        Comment::deleteByTypeAndId('App\Models\Company', $company->id);
 
-        Task::where('company_id', '=', $company->id)
-            ->update([
-                'company_id' => null
-            ]);
-
-        $findCompany = Company::find($company->id);
-
-        if ($findCompany->delete()) {
-            return redirect()->route('companies.index')
-                ->with('success' , 'Company deleted successfully');
+        if (Auth::user()->role_id == 1) {
+            return redirect()->route('admin.companies')->with('success' , 'Company deleted successfully');
         }
-
-        return back()->withInput()->with('error', 'Company could not be deleted');
+        return redirect()->route('companies.index')->with('success' , 'Company deleted successfully');
     }
 }

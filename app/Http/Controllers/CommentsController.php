@@ -10,7 +10,8 @@ class CommentsController extends Controller
 {
     public function all()
     {
-        $comments = Comment::paginate(4);
+        $itemsPerPage = 4;
+        $comments = Comment::paginate($itemsPerPage);
         return view('admin.comments', ['comments' => $comments]);
     }
 
@@ -18,25 +19,19 @@ class CommentsController extends Controller
     {
         $request->validated();
 
-        $comment = Comment::create([
-            'body' => $request->input('body'),
-            'url' => $request->input('url'),
-            'commentable_type' => $request->input('commentable_type'),
-            'commentable_id' => $request->input('commentable_id'),
-            'user_id' => Auth::user()->id
-        ]);
+        $body = $request->input('body');
+        $url = $request->input('url');
+        $commentable_type = $request->input('commentable_type');
+        $commentable_id = $request->input('commentable_id');
+        Comment::createOne($body, $url, $commentable_type, $commentable_id, Auth::id());
 
-        if ($comment) {
-            return redirect()->back()->with('success', 'Comment added successfully');
-        }
-
-        return back()->withInput()->with('errors', 'Error creating new comment');
+        return redirect()->back()->with('success', 'Comment added successfully');
     }
 
     public function update(CommentsRequest $request)
     {
         $request->validated();
-        Comment::where('id', $request->input('id'))
+        Comment::find($request->input('id'))
             ->update([
                 'body' => $request->input('body'),
                 'url' => $request->input('url')

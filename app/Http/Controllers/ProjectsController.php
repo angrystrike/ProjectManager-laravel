@@ -8,8 +8,6 @@ use App\Mail\UserRemovedFromProject;
 use App\Models\Comment;
 use App\Models\Company;
 use App\Models\Project;
-use App\Models\Task;
-use App\Models\TaskUser;
 use App\Models\User;
 use App\Models\ProjectUser;
 use Illuminate\Http\Request;
@@ -20,12 +18,10 @@ class ProjectsController extends Controller
 {
     public function deleteMember($project_id, $user_id)
     {
-        ProjectUser::where('project_id', $project_id)
-            ->where('user_id', $user_id)
-            ->delete();
+        ProjectUser::findOneByUserIdAndProjectId($user_id, $project_id)->delete();
 
-        $user = User::where('id', $user_id)->first();
-        $project = Project::where('id', $project_id)->first();
+        $user = User::find($user_id);
+        $project = Project::find($project_id);
         Mail::to($user)->send(new UserRemovedFromProject($project));
 
         return response()->json([
@@ -36,17 +32,16 @@ class ProjectsController extends Controller
     public function addUser(Request $request)
     {
         $project = Project::find($request->input('project_id'));
-        if (Auth::user()->id == $project->user_id) {
-            $user = User::where('email', $request->input('email'))->first();
+        if (Auth::id() == $project->user_id) {
+
+            $user = User::findOneByEmail($request->input('email'));
 
             if (!$user) {
                 return redirect()->route('projects.show', ['project' => $project])
                     ->with('errors', $request->input('email').' doesnt exist');
             }
 
-            $projectUser = ProjectUser::where('user_id', $user->id)
-                ->where('project_id', $project->id)
-                ->first();
+            $projectUser = ProjectUser::findOneByUserIdAndProjectId($user->id, $project->id);
 
             if ($projectUser) {
                 return redirect()->route('projects.show', ['project' => $project])
@@ -59,6 +54,7 @@ class ProjectsController extends Controller
             return redirect()->route('projects.show', ['project' => $project])
                 ->with('success', $request->input('email') . ' was added to Project successfully and was notified via email');
         }
+
         return redirect()->route('projects.show', ['project' => $project])
             ->with('errors', 'Invalid action');
     }
@@ -73,7 +69,7 @@ class ProjectsController extends Controller
     {
         $projects = null;
         if (Auth::check()) {
-            $projects = Project::where('user_id', Auth::user()->id)->get();
+            $projects = Project::findByUserId(Auth::id());
         }
         return view('projects.index', ['projects' => $projects]);
     }
@@ -82,7 +78,7 @@ class ProjectsController extends Controller
     {
         $companies = null;
         if (!$company_id) {
-            $companies = Company::where('user_id', Auth::user()->id)->get();
+            $companies = Company::findByUserId(Auth::id());
         }
 
         return view('projects.create', ['company_id' => $company_id, 'companies' => $companies]);
@@ -100,7 +96,7 @@ class ProjectsController extends Controller
         ]);
 
         if ($project) {
-            return redirect()->route('projects.show', ['project'=> $project->id])
+            return redirect()->route('projects.show', ['project' => $project])
                 ->with('success' , 'Project created successfully');
         }
 
@@ -109,13 +105,11 @@ class ProjectsController extends Controller
 
     public function show(Project $project)
     {
-        $comments = Comment::where('commentable_type', 'App\Models\Project')
-            ->where('commentable_id', $project->id)
-            ->paginate(3);
-        $creator = User::where('id', $project->user_id)->first();
-        $company = Company::where('id', $project->company_id)->first();
+        $comments = Comment::findByIdAndType('App\Models\Project', $project->id, 4);
+        $creator = User::find($project->user_id);
+        $company = Company::find($project->company_id);
 
-        return view('projects.show', ['project' => $project, 'comments' => $comments, 'creator' => $creator, 'company' => $company ]);
+        return view('projects.show', ['project' => $project, 'comments' => $comments, 'creator' => $creator, 'company' => $company]);
     }
 
     public function edit(Project $project)
@@ -123,38 +117,27 @@ class ProjectsController extends Controller
         return view('projects.edit', ['project' => $project]);
     }
 
-    public function update(ProjectsRequest $request, project $project)
+    public function update(ProjectsRequest $request, Project $project)
     {
-       $request->validated();
+        $request->validated();
 
-        $projectUpdate = Project::where('id', $project->id)
-            ->update([
-                'name'=> $request->input('name'),
-                'description'=> $request->input('description')
-            ]);
+        $project->update([
+            'name'=> $request->input('name'),
+            'description'=> $request->input('description')
+        ]);
 
-        if ($projectUpdate) {
-            return redirect()->route('projects.show', ['project'=> $project->id])
-                ->with('success' , 'Project updated successfully');
-        }
-        return back()->withInput();
+        return redirect()->route('projects.show', ['project'=> $project])
+            ->with('success' , 'Project updated successfully');
     }
 
     public function destroy(Project $project)
     {
-        ProjectUser::where('project_id', $project->id)->delete();
-        $tasks = Task::where('project_id', $project->id)->get();
-        foreach ($tasks as $task) {
-            TaskUser::where('task_id', $task->id)->delete();
-        }
-        Task::where('project_id', $project->id)->delete();
         $project->delete();
+        Comment::deleteByTypeAndId('App\Models\Project', $project->id);
 
         if (Auth::user()->role_id == 1) {
-            return redirect()->route('admin.projects')
-                ->with('success' , 'Project deleted successfully');
+            return redirect()->route('admin.projects')->with('success' , 'Project deleted successfully');
         }
-        return redirect()->route('projects.index')
-            ->with('success' , 'Project deleted successfully');
+        return redirect()->route('projects.index')->with('success' , 'Project deleted successfully');
     }
 }

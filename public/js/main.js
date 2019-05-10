@@ -8,6 +8,13 @@ $(function() {
     $('.select2-selection__rendered').css({ margin: '3 15 7 10' });
 });
 
+$(document).ready(function() {
+    $('.js-text-truncate').each(function() {
+        let numberOfVisibleCharacters = 100;
+        $(this).html($(this).html().substring(0, numberOfVisibleCharacters));
+    });
+});
+
 $(document).ready(function () {
    $(document).on("click", ".js-kick-from-thread", function () {
       let user_id = $(this).data("id");
