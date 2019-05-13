@@ -7,13 +7,34 @@
 .hidden {
     display: none;
 }
-.margin-heading {
-    margin-top: 10px;
-}
-
-.margin-comments {
-    margin-top: -15px;
+.mr-top-25 {
+    margin-top: 20px;
 }
 .vertical {
     resize: vertical;
+}
+body {
+    font-family: Geneva, Arial, Helvetica, sans-serif;
+    font-size: 18px;
+}
+.mr-left-8 {
+    margin-left: 8px;
+}
+.bg-light-green {
+    background-color: #20B2AA;
+}
+.mr-top-10 {
+    margin-top: 10px;
+}
+.underline {
+    text-decoration: underline #2fa360;
+}
+.form-control-borderless {
+    border: none;
+}
+
+.form-control-borderless:hover, .form-control-borderless:active, .form-control-borderless:focus {
+    border: none;
+    outline: none;
+    box-shadow: none;
 }

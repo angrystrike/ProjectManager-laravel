@@ -2,83 +2,47 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CommentsRequest;
 use App\Models\Comment;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CommentsController extends Controller
 {
-    public function index()
+    public function all()
     {
-
+        $itemsPerPage = 4;
+        $comments = Comment::paginate($itemsPerPage);
+        return view('admin.comments', ['comments' => $comments]);
     }
 
-    public function create()
+    public function store(CommentsRequest $request)
     {
+        $request->validated();
 
+        $body = $request->input('body');
+        $url = $request->input('url');
+        $commentable_type = $request->input('commentable_type');
+        $commentable_id = $request->input('commentable_id');
+        Comment::createOne($body, $url, $commentable_type, $commentable_id, Auth::id());
+
+        return redirect()->back()->with('success', 'Comment added successfully');
     }
 
-    public function store(Request $request)
+    public function update(CommentsRequest $request)
     {
-        if (Auth::check()) {
-            $comment = Comment::create([
+        $request->validated();
+        Comment::find($request->input('id'))
+            ->update([
                 'body' => $request->input('body'),
-                'url' => $request->input('url'),
-                'commentable_type' => $request->input('commentable_type'),
-                'commentable_id' => $request->input('commentable_id'),
-                'user_id' => Auth::user()->id
+                'url' => $request->input('url')
             ]);
 
-            if ($comment) {
-                return redirect()->back()->with('success', 'Comment added successfully');
-            }
-        }
-
-        return back()->withInput()->with('errors', 'Error creating new comment');
+        return response()->json(['message' => 'Comment was successfully updated!']);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Comment  $comment
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Comment  $comment
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Comment  $comment
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Comment  $comment
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Comment $comment)
     {
-        //
+        $comment->delete();
+        return response()->json(['message' => 'Comment was successfully deleted']);
     }
 }

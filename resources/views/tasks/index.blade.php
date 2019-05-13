@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -7,13 +6,18 @@
             <div class="card-header text-center text-white bg-primary"> Tasks <a class="pull-right btn btn-primary" href="/tasks/create">Create new</a></div>
             <div class="card-body">
                 <ul class="list-group">
-                    @foreach($tasks as $task)
+                    @if (!is_null($tasks) && count($tasks) > 0)
+                        @foreach($tasks as $task)
+                            <li class="list-group-item">
+                                <a href="/tasks/{{ $task->id }}"> {{ $task->name }} </a>
+                            </li>
+                        @endforeach
+                    @else
                         <li class="list-group-item">
-                            <a href="/tasks/{{ $task->id }}"> {{ $task->name }} </a>
+                            <p class="text-center">No Tasks yet</p>
                         </li>
-                    @endforeach
+                    @endif
                 </ul>
-
             </div>
         </div>
     </div>

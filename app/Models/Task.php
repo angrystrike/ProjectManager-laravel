@@ -8,31 +8,43 @@ class Task extends Model
 {
     protected $fillable = [
         'name',
+        'description',
+        'kind',
+        'priority',
+        'days',
         'project_id',
         'user_id',
-        'days',
-        'hours',
-        'duration',
         'company_id'
     ];
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function project() {
+    public function project()
+    {
         return $this->belongsTo(Project::class);
     }
 
-    public function company() {
+    public function company()
+    {
         return $this->belongsTo(Company::class);
     }
 
-    public function users() {
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    public function users()
+    {
         return $this->belongsToMany(User::class);
     }
 
-    public function comments() {
-        return $this->morphMany(Comment::class, 'commentable');
+    public static function findByUserId($user_id)
+    {
+        $tasks = Task::where('user_id', $user_id)->get();
+        return $tasks;
     }
 }

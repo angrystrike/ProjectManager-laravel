@@ -2,16 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TasksRequest;
+use App\Mail\UserAttachedToTask;
+use App\Mail\UserRemovedFromTask;
+use App\Models\Comment;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\TaskUser;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class TasksController extends Controller
 {
-    public function adduser(Request $request)
+    public function deleteMember($task_id, $user_id)
+    {
+        TaskUser::findOneByUserIdAndTaskId($user_id, $task_id)->delete();
+        $user = User::find($user_id);
+        $task = Task::find($task_id);
+        Mail::to($user)->send(new UserRemovedFromTask($task));
+
+        return response()->json(['message' => 'Task member was removed and was notified via email']);
+    }
+
+    public function addUser(Request $request)
     {
         $task = Task::find($request->input('task_id'));
         if (Auth::user()->id == $task->user_id) {
@@ -22,9 +37,7 @@ class TasksController extends Controller
                     ->with('errors', $request->input('email').' doesnt exist');
             }
 
-            $taskUser = TaskUser::where('user_id', $user->id)
-                ->where('task_id', $task->id)
-                ->first();
+            $taskUser = TaskUser::findOneByUserIdAndTaskId($user->id, $task->id);
 
             if ($taskUser) {
                 return redirect()->route('tasks.show', ['task' => $task])
@@ -32,9 +45,12 @@ class TasksController extends Controller
             }
 
             $task->users()->attach($user->id);
+            Mail::to($user)->send(new UserAttachedToTask($task));
+
             return redirect()->route('tasks.show', ['task' => $task])
-                ->with('success', $request->input('email') . ' was added for this Task successfully');
+                ->with('success', $request->input('email') . ' was added for this Task successfully and notified via email');
         }
+
         return redirect()->route('tasks.show', ['task' => $task])
             ->with('errors', 'Invalid action');
     }
@@ -42,17 +58,16 @@ class TasksController extends Controller
     public function all()
     {
         $tasks = Task::all();
-        return view('tasks.index', ['tasks' => $tasks]);
+        return view('admin.tasks', ['tasks' => $tasks]);
     }
 
     public function index()
     {
+        $tasks = null;
         if (Auth::check()) {
-            $tasks = Task::where('user_id', Auth::user()->id)->get();
-
-            return view('tasks.index', ['tasks'=> $tasks]);
+            $tasks = Task::findByUserId(Auth::id());
         }
-        return view('auth.login');
+        return view('tasks.index', ['tasks' => $tasks]);
     }
 
 
@@ -60,76 +75,81 @@ class TasksController extends Controller
     {
         $projects = null;
         if (!$project_id) {
-            $projects = Project::where('user_id', Auth::user()->id)->get();
+            $projects = Project::findByUserId(Auth::id());
         }
 
         return view('tasks.create', ['project_id' => $project_id, 'projects' => $projects]);
     }
 
 
-    public function store(Request $request)
+    public function store(TasksRequest $request)
     {
-        if (Auth::check()) {
-            $task = Task::create([
-                'name' => $request->input('name'),
-                'days' => $request->input('days'),
-                'hours' => $request->input('hours'),
-                'duration' => $request->input('duration'),
-                'project_id' => $request->input('project_id'),
-                'user_id' => Auth::user()->id
-            ]);
+        $request->validated();
 
-            if ($task) {
-                return redirect()->route('tasks.show', ['task' => $task->id])
-                    ->with('success' , 'Task created successfully');
-            }
+        $task = Task::create([
+            'name' => $request->input('name'),
+            'description' => $request->input('description'),
+            'kind' => $request->input('kind'),
+            'priority' => $request->input('priority'),
+            'days' => $request->input('days'),
+            'project_id' => $request->input('project_id'),
+            'user_id' => Auth::id()
+        ]);
 
+        if ($task) {
+            return redirect()->route('tasks.show', ['task' => $task->id])
+                ->with('success' , 'Task created successfully');
         }
 
-        return back()->withInput()->with('errors', 'Error creating new Project');
+        return back()->withInput()->with('errors', 'Error creating new Task');
     }
 
 
     public function show(Task $task)
     {
-        $task = Task::find($task->id);
-        $comments = $task->comments;
-        return view('tasks.show', ['task' => $task, 'comments' => $comments ]);
+        $itemsPerPage = 3;
+        $comments = Comment::findByIdAndType('App\Models\Task',  $task->id, $itemsPerPage);
+        $creator = User::find($task->user_id);
+        $project = Project::find($task->project_id);
+
+        return view('tasks.show', ['task' => $task, 'comments' => $comments, 'creator' => $creator, 'project' => $project]);
     }
 
 
     public function edit(Task $task)
     {
-        $task = Project::find($task->id);
         return view('tasks.edit', ['task' => $task]);
     }
 
-    public function update(Request $request, Task $task)
+    public function update(TasksRequest $request, Task $task)
     {
-        $taskUpdate = Task::where('id', $task->id)
-            ->update([
-                'name'=> $request->input('name'),
-                'days'=> $request->input('days'),
-                'hours'=> $request->input('hours'),
-                'duration'=> $request->input('duration')
-            ]);
+        $request->validated();
+
+        $taskUpdate = $task->update([
+            'name' => $request->input('name'),
+            'description' => $request->input('description'),
+            'kind' => $request->input('kind'),
+            'priority' => $request->input('priority'),
+            'days' => $request->input('days'),
+        ]);
 
         if ($taskUpdate) {
             return redirect()->route('tasks.show', ['task' => $task->id])
                 ->with('success' , 'Task updated successfully');
         }
+
         return back()->withInput();
     }
 
     public function destroy(Task $task)
     {
-        $findTask = Task::find($task->id);
-        if ($findTask && $findTask->delete()) {
+        $task->delete();
+        Comment::deleteByTypeAndId('App\Models\Task', $task->id);
 
-            return redirect()->route('tasks.index')
-                ->with('success' , 'Task deleted successfully');
+        if (Auth::user()->role_id == 1) {
+            return redirect()->route('admin.tasks')->with('success' , 'Task deleted successfully');
         }
 
-        return back()->withInput()->with('errors' , 'Task could not be deleted');
+        return redirect()->route('tasks.index')->with('success' , 'Task deleted successfully');
     }
 }
